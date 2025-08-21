@@ -151,3 +151,23 @@ export const isProfileComplete = query({
     return !!(user?.firstName && user?.lastName && user?.roles);
   },
 });
+
+export const checkEmailVerifiedByEmail = mutation({
+  args: { email: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", args.email))
+      .unique();
+
+    if (!user) {
+      return { success: false, code: "EMAIL_NOT_VERIFIED" };
+    }
+
+    if (!user.emailVerified) {
+      throw new Error("Please verify your email before logging in.");
+    }
+
+    return { success: true };
+  },
+});

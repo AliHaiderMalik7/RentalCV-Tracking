@@ -1,7 +1,6 @@
 import { mutation, query, action } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { PasswordResetEmail } from "./passwordReset/PasswordResetEmail";
 import { Resend } from "resend";
 
 // Generate email verification token
@@ -86,22 +85,20 @@ export const verifyEmail = mutation({
 export const sendVerificationEmail = action({
   args: { email: v.string(), token: v.string() },
   handler: async (ctx, args) => {
-    // This would integrate with your email service (Resend, SendGrid, etc.)
-    // For now, we'll just log the verification link
+
+    
+  
     // const verificationLink = `${process.env.SITE_URL}/verify-email?token=${args.token}`;
     const verificationLink = `http://localhost:5173/verify-email?token=${args.token}`;
     
     console.log(`Send verification email to ${args.email}`);
     console.log(`Verification link: ${verificationLink}`);
     
-    // TODO: Replace with actual email sending logic
-    // Example with Resend:
+ 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
-      // TODO: Update with your app name and email address
       from: process.env.AUTH_EMAIL ?? "My App <onboarding@resend.dev>",
       to: args.email,
-      // TODO: Update with your app name
       subject: "Verify your email address",
       html: `
         <h1>Verify your email address</h1>
