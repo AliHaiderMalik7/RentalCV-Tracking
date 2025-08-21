@@ -1,27 +1,54 @@
-import { useState } from 'react';
-import { FaCheckCircle, FaLink, FaQrcode, FaUpload, FaShieldAlt, FaCopy, FaEnvelope, FaLock } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { 
+  FaCheckCircle, FaLink, FaQrcode, FaUpload, 
+  FaShieldAlt, FaCopy, FaEnvelope, FaLock 
+} from 'react-icons/fa';
 
-const SettingsPage = () => {
-  // Mock data state
+const SettingsPage = ({ userFromDb }: { userFromDb: any }) => {
+  // Sync state with DB user data
   const [settings, setSettings] = useState({
     verified: false,
-    shareId: null as string | null,
+    shareId: userFromDb?.shareId || null,
     showContactInfo: true,
     showRentalHistory: true,
     searchable: true,
     requireApproval: true,
-    idPhoto: null as File | null
+    profilePicture: userFromDb?.profilePicture || null,
+    proofOfAddress: userFromDb?.proofOfAddress || [],
+    idVerificationDocs: userFromDb?.idVerificationDocs || []
   });
 
-  // Handle ID verification upload
-  const handleVerificationUpload = (files: File[]) => {
+  // Check verification requirements whenever these fields change
+  useEffect(() => {
+    const isVerified =
+      settings.profilePicture &&
+      settings.proofOfAddress?.length > 0 &&
+      settings.idVerificationDocs?.length > 0;
+
+    setSettings(prev => ({
+      ...prev,
+      verified: Boolean(isVerified)
+    }));
+  }, [
+    settings.profilePicture,
+    settings.proofOfAddress,
+    settings.idVerificationDocs
+  ]);
+
+  // Handle uploads
+  const handleUpload = (
+    files: File[],
+    field: "profilePicture" | "proofOfAddress" | "idVerificationDocs"
+  ) => {
     if (files.length > 0) {
-      setSettings(prev => ({
-        ...prev,
-        idPhoto: files[0],
-        verified: true,
-        shareId: 't_' + Math.random().toString(36).substring(2, 8)
-      }));
+      if (field === "profilePicture") {
+        setSettings(prev => ({ ...prev, profilePicture: files[0].name }));
+      } else {
+        setSettings(prev => ({
+          ...prev,
+          [field]: [...(prev[field] || []), files[0].name]
+        }));
+      }
     }
   };
 
@@ -63,7 +90,7 @@ const SettingsPage = () => {
               <p className="text-gray-600 mt-1">
                 {settings.verified 
                   ? "Your identity has been verified" 
-                  : "Verify your identity to access all features"}
+                  : "Please upload the required documents"}
               </p>
             </div>
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -76,34 +103,66 @@ const SettingsPage = () => {
           </div>
 
           {!settings.verified && (
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Upload Government ID
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Profile Picture Upload */}
+              <label className={`cursor-pointer ${settings.profilePicture ? 'opacity-50 pointer-events-none' : ''}`}>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition">
+                  <FaUpload className="mx-auto text-gray-400 text-2xl" />
+                  <p className="text-sm text-gray-600 mt-2">
+                    Upload Profile Picture
+                  </p>
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*"
+                    disabled={!!settings.profilePicture}
+                    onChange={(e) => handleUpload(Array.from(e.target.files || []), "profilePicture")}
+                  />
+                </div>
+                {settings.profilePicture && (
+                  <p className="text-sm text-green-600 mt-2">✅ Uploaded</p>
+                )}
               </label>
-              <div className="flex items-center gap-4">
-                <label className="flex-1 cursor-pointer">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition">
-                    <FaUpload className="mx-auto text-gray-400 text-2xl" />
-                    <p className="text-sm text-gray-600 mt-2">
-                      Click to upload ID (JPG, PNG, PDF)
-                    </p>
-                    <input 
-                      type="file" 
-                      className="hidden" 
-                      accept="image/*,.pdf"
-                      onChange={(e) => handleVerificationUpload(Array.from(e.target.files || []))}
-                    />
-                  </div>
-                </label>
-              </div>
-              {settings.idPhoto && (
-                <p className="text-sm text-green-600 mt-2">
-                  Uploaded: {settings.idPhoto.name}
-                </p>
-              )}
-              <p className="text-xs text-gray-500 mt-2">
-                We verify your identity to protect your account and enable sharing with landlords.
-              </p>
+
+              {/* Proof of Address Upload */}
+              <label className={`cursor-pointer ${settings.proofOfAddress?.length > 0 ? 'opacity-50 pointer-events-none' : ''}`}>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition">
+                  <FaUpload className="mx-auto text-gray-400 text-2xl" />
+                  <p className="text-sm text-gray-600 mt-2">
+                    Upload Proof of Address
+                  </p>
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*,.pdf"
+                    disabled={settings.proofOfAddress?.length > 0}
+                    onChange={(e) => handleUpload(Array.from(e.target.files || []), "proofOfAddress")}
+                  />
+                </div>
+                {settings.proofOfAddress?.length > 0 && (
+                  <p className="text-sm text-green-600 mt-2">✅ Uploaded</p>
+                )}
+              </label>
+
+              {/* ID Verification Upload */}
+              <label className={`cursor-pointer ${settings.idVerificationDocs?.length > 0 ? 'opacity-50 pointer-events-none' : ''}`}>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition">
+                  <FaUpload className="mx-auto text-gray-400 text-2xl" />
+                  <p className="text-sm text-gray-600 mt-2">
+                    Upload Government ID
+                  </p>
+                  <input 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*,.pdf"
+                    disabled={settings.idVerificationDocs?.length > 0}
+                    onChange={(e) => handleUpload(Array.from(e.target.files || []), "idVerificationDocs")}
+                  />
+                </div>
+                {settings.idVerificationDocs?.length > 0 && (
+                  <p className="text-sm text-green-600 mt-2">✅ Uploaded</p>
+                )}
+              </label>
             </div>
           )}
         </div>
@@ -176,13 +235,13 @@ const SettingsPage = () => {
                 <>
                   <div className="flex items-center gap-3">
                     <button 
-                      className="flex items-center gap-2 text-sm text-[#0369a1] hover:text-[#075985]"
+                      className="flex items-center gap-2 text-sm text-[#0369a1] hover:text-[#075985] cursor-pointer"
                       onClick={() => alert('QR code download functionality would go here')}
                     >
                       <FaQrcode /> Download QR Code
                     </button>
                     <button 
-                      className="flex items-center gap-2 text-sm text-[#0369a1] hover:text-[#075985]"
+                      className="flex items-center gap-2 text-sm text-[#0369a1] hover:text-[#075985] cursor-pointer"
                       onClick={() => {
                         window.open(
                           `mailto:?subject=My RentalCV Profile&body=View my rental profile: https://rentalcv.ai/t/${settings.shareId}`,

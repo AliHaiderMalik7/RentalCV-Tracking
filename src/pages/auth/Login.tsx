@@ -50,6 +50,10 @@ const Login = () => {
         toast.error("Please verify your email before logging in.");
         return;
       }
+      if (response.code === "USER_NOT_FOUND") {
+        toast.error("User not found.");
+        return;
+      }
     }
       const result = await signIn("password", {
         flow: "signIn",

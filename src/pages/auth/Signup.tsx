@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaUser,
   FaEnvelope,
@@ -9,28 +9,52 @@ import {
   FaMapMarkerAlt,
   FaCity,
   FaGlobeAmericas,
+  FaUpload,
 } from "react-icons/fa";
 import signupImage from "../../../public/banner.avif";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useNavigate } from "react-router-dom";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import InputField from "@/components/common/InputField";
 import Dropdown from "@/components/common/Dropdown";
 import AuthBanner from "@/components/common/AuthBanner";
 
 type SignupProps = {
-  selectedRole: "tenant" | "landlord" | null;
+  selectedRole: "tenant" | "landlord" | any;
 };
 
 const Signup = ({ selectedRole }: SignupProps) => {
   const navigate = useNavigate();
-  if (!selectedRole) {
-    navigate("/select-role");
-    return null;
-  }
+
+
+  useEffect(() => {
+    if (!selectedRole) {
+      navigate("/select-role");
+      return;
+    }
+
+    // Show landlord-specific prompt as toast
+    if (selectedRole === "landlord") {
+      toast(
+        "🌟 Get your 'Verified Landlord' badge and show tenants you're committed to the highest standards of service.",
+        {
+          position: "top-center",
+          autoClose: 7000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          className: "premium-toast",
+          // bodyClassName: "premium-toast-body",
+          progressClassName: "premium-toast-progress",
+        }
+      );
+    }
+  }, [selectedRole, navigate]);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -42,6 +66,9 @@ const Signup = ({ selectedRole }: SignupProps) => {
     state: "",
     city: "",
     postalCode: "",
+    idVerificationDocs: [] as File[],
+    proofOfAddress: [] as File[],
+    landlordLicense: [] as File[],
   });
 
   const { signOut } = useAuthActions();
@@ -69,10 +96,12 @@ const Signup = ({ selectedRole }: SignupProps) => {
   };
 
 
+
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    const form = event.currentTarget; // ✅ this is your HTMLFormElement
-    const data = new FormData(form); // ✅ corre    setError("");
+    const form = event.currentTarget;
+    const data = new FormData(form);
     setSuccess("");
     try {
 
@@ -124,7 +153,7 @@ const Signup = ({ selectedRole }: SignupProps) => {
             setTimeout(() => {
               navigate('/login')
 
-            },3000)
+            }, 3000)
           } catch (error) {
             console.error("Failed to send verification email:", error);
             toast.success("Account created! Please verify your email to continue.");
@@ -132,31 +161,6 @@ const Signup = ({ selectedRole }: SignupProps) => {
           // }
         });
 
-
-        // if(result.signingIn){
-
-        // }
-        // send verification email
-
-
-        // console.log("Response signup received is", result);
-        // if (result.signingIn) {
-        //   const updateUserResponse = await updateUser({
-        //     email: formData.email,
-        //     firstName: formData.firstName,
-        //     lastName: formData.lastName,
-        //     phone: formData.phone,
-        //     gender: formData.gender as "male" | "female" | "other",
-        //     address: formData.address,
-        //     city: formData.city,
-        //     state: formData.state,
-        //     postalCode: formData.postalCode,
-        //     roles: selectedRole,
-        //     createdAt: Date.now()
-        //   });
-        //   console.log("updateUserResponse", updateUserResponse);
-        //   navigate('/home')
-        // }
       }
 
 
@@ -172,6 +176,15 @@ const Signup = ({ selectedRole }: SignupProps) => {
   const handleLogin = () => {
     navigate("/login")
   }
+
+  const handleVerificationUpload = (field: keyof typeof formData, files: File[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: [...prev[field], ...files], // append if multiple files
+    }));
+  };
+
+  
   return (
     <div className="min-h-screen flex bg-slate-50 font-sans antialiased">
       {/* Left Side - Premium Image Section */}
@@ -350,6 +363,81 @@ const Signup = ({ selectedRole }: SignupProps) => {
               </div>
             </div>
 
+            {selectedRole === "landlord" && (
+              <div className="space-y-4 mt-6">
+                <h3 className="text-lg font-semibold text-slate-800">
+                  🌟 Verified Landlord (Optional)
+                </h3>
+                <p className="text-sm text-slate-600">
+                  Build trust with tenants by uploading verification documents.
+                  Once verified, you’ll receive the prestigious <span className="font-semibold">Verified Landlord Badge</span>.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Upload ID */}
+<label className="cursor-pointer">
+  <div className="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:bg-slate-50 transition shadow-sm">
+    <FaUpload className="mx-auto text-gray-400 text-2xl" />
+    <p className="text-sm text-gray-600 mt-2">
+      Upload Photo ID <br />
+      <span className="text-xs text-gray-500">(Passport / Driver’s License)</span>
+    </p>
+    <input
+      type="file"
+      className="hidden"
+      accept="image/*,.pdf"
+      multiple
+      onChange={(e) =>
+        handleVerificationUpload("idVerificationDocs", Array.from(e.target.files || []))
+      }
+    />
+  </div>
+</label>
+
+{/* Proof of Address */}
+<label className="cursor-pointer">
+  <div className="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:bg-slate-50 transition shadow-sm">
+    <FaUpload className="mx-auto text-gray-400 text-2xl" />
+    <p className="text-sm text-gray-600 mt-2">
+      Upload Proof of Address <br />
+      <span className="text-xs text-gray-500">(Utility Bill, Bank Statement)</span>
+    </p>
+    <input
+      type="file"
+      className="hidden"
+      accept="image/*,.pdf"
+      multiple
+      onChange={(e) =>
+        handleVerificationUpload("proofOfAddress", Array.from(e.target.files || []))
+      }
+    />
+  </div>
+</label>
+
+{/* Landlord License */}
+<label className="cursor-pointer sm:col-span-2">
+  <div className="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:bg-slate-50 transition shadow-sm">
+    <FaUpload className="mx-auto text-gray-400 text-2xl" />
+    <p className="text-sm text-gray-600 mt-2">
+      Upload Landlord License / Company Details <br />
+      <span className="text-xs text-gray-500">(Optional)</span>
+    </p>
+    <input
+      type="file"
+      className="hidden"
+      accept="image/*,.pdf"
+      multiple
+      onChange={(e) =>
+        handleVerificationUpload("landlordLicense", Array.from(e.target.files || []))
+      }
+    />
+  </div>
+</label>
+
+                </div>
+              </div>
+            )}
+
             {/* Terms and Conditions */}
             <div className="flex items-center pt-2">
               <input
@@ -369,6 +457,7 @@ const Signup = ({ selectedRole }: SignupProps) => {
                 </a>
               </label>
             </div>
+
 
 
             {/* Submit Button */}

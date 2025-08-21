@@ -40,6 +40,12 @@ export const users = defineTable({
   phoneVerificationCode: v.optional(v.string()),
   phoneVerificationExpires: v.optional(v.number()),
 
+
+   // ✅ New optional fields
+   landlordLicense: v.optional(v.array(v.string())),              
+   proofOfAddress: v.optional(v.array(v.string())), 
+   idVerificationDocs: v.optional(v.array(v.string())), 
+
   createdAt: v.optional(v.number()),
 }).index("email", ["email"])
 .index("by_role", ["roles"])

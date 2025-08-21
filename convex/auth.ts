@@ -78,6 +78,11 @@ export const updateUser = mutation({
       v.literal("admin")
     ),
     createdAt: v.number(),
+
+    // ✅ New optional landlord verification fields
+    idVerificationDocs: v.optional(v.array(v.string())),  
+    proofOfAddress: v.optional(v.array(v.string())),      
+    landlordLicense: v.optional(v.array(v.string())),     
   },
   handler: async (ctx, args) => {
     // Check if user already exists
@@ -87,7 +92,7 @@ export const updateUser = mutation({
       .first();
 
     if (existing) {
-      // Update existing user
+      // ✅ Update existing user
       await ctx.db.patch(existing._id, {
         firstName: args.firstName,
         lastName: args.lastName,
@@ -98,13 +103,17 @@ export const updateUser = mutation({
         state: args.state,
         postalCode: args.postalCode,
         roles: args.roles,
+        idVerificationDocs: args.idVerificationDocs,
+        proofOfAddress: args.proofOfAddress,
+        landlordLicense: args.landlordLicense,
       });
     } else {
-      // Create new user
+      // ✅ Create new user
       await ctx.db.insert("users", args);
     }
   },
 });
+
 
 
 export const getCurrentUser = query({
@@ -161,11 +170,11 @@ export const checkEmailVerifiedByEmail = mutation({
       .unique();
 
     if (!user) {
-      return { success: false, code: "EMAIL_NOT_VERIFIED" };
+      return { success: false, code: "USER_NOT_FOUND" };
     }
 
     if (!user.emailVerified) {
-      throw new Error("Please verify your email before logging in.");
+      return { success: false, code: "EMAIL_NOT_VERIFIED" };
     }
 
     return { success: true };
