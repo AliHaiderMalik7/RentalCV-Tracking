@@ -1,0 +1,127 @@
+import { Route, Routes, useNavigate, Navigate } from "react-router-dom";
+import Login from "../pages/auth/Login";
+import Signup from "../pages/auth/Signup";
+import RoleSelection from "../pages/role/RoleSelection";
+import { useEffect, useState } from "react";
+import { Authenticated, Unauthenticated, useConvexAuth } from "convex/react";
+import Home from "@/pages/profile/Home";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import ResetPassword from "@/pages/auth/ResetPassword";
+import { ProfileView } from "@/components/home/Profile";
+import EmailVerification from "@/pages/auth/EmailVerification"; // ✅ import it
+
+export function AppRoutes() {
+  const navigate = useNavigate();
+  const [selectedRole, setSelectedRole] = useState<any>(null);
+  const [resetEmail, setResetEmail] = useState<string>();
+  const [verifyEmail, setVerifyEmail] = useState<string>(); // ✅ new state
+  const { isLoading, isAuthenticated } = useConvexAuth();
+  const [step, setStep] = useState<"forgot" | { email: string }>("forgot");
+
+  const handleRoleSelect = (role: "tenant" | "landlord") => {
+    setSelectedRole(role);
+    navigate("/signup");
+  };
+
+  const handleEmailSubmitted = (email: any) => {
+    setResetEmail(email);
+    navigate("/reset-password");
+  };
+
+  // 👇 Handle loading state
+  if (isLoading) {
+    return <div>Loading...</div>; // or a spinner component
+  }
+
+  return (
+    <Routes>
+      {/* Public routes */}
+      <Route
+        path="/login"
+        element={
+          <Unauthenticated>
+            <Login />
+          </Unauthenticated>
+        }
+      />
+
+      <Route
+        path="/forgot"
+        element={
+          <Unauthenticated>
+            <ForgotPassword
+              onEmailSubmitted={handleEmailSubmitted}
+              step={step}
+              setStep={setStep}
+            />
+          </Unauthenticated>
+        }
+      />
+
+      <Route
+        path="/reset-password"
+        element={
+          <Unauthenticated>
+            {typeof step === "object" ? (
+              <ResetPassword step={step} setStep={setStep} email={step.email} />
+            ) : (
+              <Navigate to="/forgot" replace />
+            )}
+          </Unauthenticated>
+        }
+      />
+
+      <Route
+        path="/select-role"
+        element={
+          <Unauthenticated>
+            <RoleSelection onSelect={handleRoleSelect} />
+          </Unauthenticated>
+        }
+      />
+
+      <Route
+        path="/signup"
+        element={
+          selectedRole ? (
+            <Unauthenticated>
+              <Signup selectedRole={selectedRole} />
+            </Unauthenticated>
+          ) : (
+            <Navigate to="/select-role" replace />
+          )
+        }
+      />
+
+      {/* ✅ Email Verification Route */}
+      <Route
+        path="/verify-email"
+        element={
+        //   <Unauthenticated>
+                          <EmailVerification email={verifyEmail} />
+
+          
+        }
+      />
+
+      {/* Protected route */}
+      <Route
+        path="/home"
+        element={
+          <Authenticated>
+            <Home />
+          </Authenticated>
+        }
+      />
+
+      {/* Root redirect */}
+      <Route
+        path="/"
+        element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />}
+      />
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
