@@ -150,12 +150,12 @@ export const ProfileView = ({ user, onEditProfile }: ProfileViewProps) => {
                                 {formatJoinDate(displayUser?._creationTime)}
                             </p>
                         </div>
-                        <div>
+                        {/* <div>
                             <p className="text-sm text-slate-500">Account Status</p>
                             <p className="font-medium text-emerald-600">Active</p>
-                        </div>
+                        </div> */}
                         <div>
-                            <p className="text-sm text-slate-500">Verification</p>
+                            <p className="text-sm text-slate-500">Account Status</p>
                             <p
                                 className={`font-medium ${isVerifiedLandlord
                                         ? "text-emerald-600"

@@ -3,8 +3,8 @@ import React from 'react';
 const AuthBanner = ({ 
   imageSrc, 
   altText = "Luxury property",
-  titlePart1 = "Tenant",
-  titlePart2 = "Track.ai",
+  titlePart1 = "Rental",
+  titlePart2 = "CV.ai",
   subtitle = "Elevating rental experiences through premium verification",
   borderColor = "#28c76f",
   titleColor = "#0369a1"

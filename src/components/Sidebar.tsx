@@ -11,6 +11,8 @@ import {
   } from "react-icons/fa";
   import { useAuthActions } from "@convex-dev/auth/react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
   
   interface SidebarProps {
     role?: 'landlord' | 'tenant';
@@ -19,6 +21,7 @@ import { useNavigate } from "react-router-dom";
   }
   
   const Sidebar = ({ role, activeTab, onTabChange }: SidebarProps) => {
+    const user:any = useQuery(api.auth.getCurrentUser);
     const { signOut } = useAuthActions();
     const navigate = useNavigate();
 
@@ -62,7 +65,7 @@ import { useNavigate } from "react-router-dom";
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[#0369a1] tracking-tight">
-                Tenant<span className="text-[#075985] font-bold">Track.ai</span><span className="text-[#0369a1] text-sm align-super"></span>
+                Rental<span className="text-[#075985] font-bold">CV.ai</span><span className="text-[#0369a1] text-sm align-super"></span>
               </h1>
               <p className="text-xs text-[#0369a1]/80 font-medium tracking-wider mt-0.5">
                 {role === 'landlord' ? 'LANDLORD PORTAL' : 'TENANT PORTAL'}
