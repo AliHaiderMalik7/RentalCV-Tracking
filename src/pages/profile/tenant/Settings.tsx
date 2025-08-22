@@ -1,10 +1,17 @@
+import { useQuery } from 'convex/react';
 import { useState, useEffect } from 'react';
 import { 
   FaCheckCircle, FaLink, FaQrcode, FaUpload, 
   FaShieldAlt, FaCopy, FaEnvelope, FaLock 
 } from 'react-icons/fa';
+import { api } from '../../../../convex/_generated/api';
 
 const SettingsPage = ({ userFromDb }: { userFromDb: any }) => {
+
+  const user = useQuery(api.auth.getCurrentUser);
+  console.log("current user is", user);
+  
+
   // Sync state with DB user data
   const [settings, setSettings] = useState({
     verified: false,

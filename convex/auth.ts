@@ -11,7 +11,7 @@ import { verify } from "crypto";
 // export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 //   providers: [Password({  reset: ResendOTPPasswordReset})],
 
-  
+
 // });
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
@@ -36,7 +36,7 @@ export const validateSession = query({
     const identity = await ctx.auth.getUserIdentity();
     return {
       isValid: !!identity,
-      user: identity 
+      user: identity
     };
   },
 });
@@ -45,7 +45,7 @@ export const checkUserExists = mutation({
   args: { email: v.string() },
   handler: async (ctx, { email }) => {
     // Check both auth system and your custom users table
-    
+
     // 1. Check Convex auth system (for registered users)
     const tokenIdentifier = `password|${email}`;
 
@@ -55,12 +55,13 @@ export const checkUserExists = mutation({
       .withIndex("email", (q) => q.eq("email", email))
       .first();
 
-    return { 
-      exists:  !!userRecord,
+    return {
+      exists: !!userRecord,
       inUsersTable: !!userRecord
     };
   },
 });
+
 export const updateUser = mutation({
   args: {
     email: v.string(),
@@ -80,9 +81,11 @@ export const updateUser = mutation({
     createdAt: v.number(),
 
     // ✅ New optional landlord verification fields
-    idVerificationDocs: v.optional(v.array(v.string())),  
-    proofOfAddress: v.optional(v.array(v.string())),      
-    landlordLicense: v.optional(v.array(v.string())),     
+    idVerificationDocs: v.optional(v.array(v.id("_storage"))),
+    proofOfAddress: v.optional(v.array(v.id("_storage"))),
+    landlordLicense: v.optional(v.array(v.id("_storage"))),
+    verified: v.optional(v.boolean()),
+
   },
   handler: async (ctx, args) => {
     // Check if user already exists
@@ -106,6 +109,7 @@ export const updateUser = mutation({
         idVerificationDocs: args.idVerificationDocs,
         proofOfAddress: args.proofOfAddress,
         landlordLicense: args.landlordLicense,
+        verified: args.verified,
       });
     } else {
       // ✅ Create new user

@@ -21,6 +21,8 @@ import { api } from "../../../convex/_generated/api";
 import InputField from "@/components/common/InputField";
 import Dropdown from "@/components/common/Dropdown";
 import AuthBanner from "@/components/common/AuthBanner";
+import { generateUploadUrl } from "../../../convex/properties";
+import { Id } from "../../../convex/_generated/dataModel";
 
 type SignupProps = {
   selectedRole: "tenant" | "landlord" | any;
@@ -66,9 +68,9 @@ const Signup = ({ selectedRole }: SignupProps) => {
     state: "",
     city: "",
     postalCode: "",
-    idVerificationDocs: [] as File[],
-    proofOfAddress: [] as File[],
-    landlordLicense: [] as File[],
+    idVerificationDocs: [],
+    proofOfAddress: [],
+    landlordLicense: [],
   });
 
   const { signOut } = useAuthActions();
@@ -82,8 +84,32 @@ const Signup = ({ selectedRole }: SignupProps) => {
   const generateToken = useMutation(api.emailVerification.generateEmailVerificationToken);
   const sendEmail = useAction(api.emailVerification.sendVerificationEmail);
   const updateUser = useMutation(api.auth.updateUser)
+  const generateUrl = useMutation(api.properties.generateUrl);
 
   const { signIn } = useAuthActions();
+
+  const processFiles = async (files: File[]): Promise<Id<"_storage">[]> => {
+    const uploadPromises = files.map(async (file) => {
+      // Get upload URL
+      const postUrl = await generateUrl();
+
+      // Upload file
+      const result = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+
+      if (!result.ok) {
+        throw new Error(`Upload failed: ${result.statusText}`);
+      }
+
+      const json = await result.json();
+      return json.storageId as Id<"_storage">;
+    });
+
+    return Promise.all(uploadPromises);
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -113,6 +139,10 @@ const Signup = ({ selectedRole }: SignupProps) => {
 
       let email = formData?.email;
       const { exists, inUsersTable } = await checkUserExists({ email });
+      const idDocs = await processFiles(formData.idVerificationDocs);
+      const proofDocs = await processFiles(formData.proofOfAddress);
+      const landlordDocs = await processFiles(formData.landlordLicense);
+
 
       console.log('exists', exists, inUsersTable);
 
@@ -131,6 +161,16 @@ const Signup = ({ selectedRole }: SignupProps) => {
           signOut();
           // if(result.signingIn){
           try {
+            let validate = false;
+            if (selectedRole === "landlord") {
+              const hasAllDocs =
+                formData.idVerificationDocs.length > 0 &&
+                formData.proofOfAddress.length > 0 &&
+                formData.landlordLicense.length > 0;
+
+              validate = hasAllDocs;
+            }
+
             const email: any = formData.email;
             const token = await generateToken({ email });
             await sendEmail({ email, token });
@@ -145,7 +185,12 @@ const Signup = ({ selectedRole }: SignupProps) => {
               state: formData.state,
               postalCode: formData.postalCode,
               roles: selectedRole,
-              createdAt: Date.now()
+              createdAt: Date.now(),
+              verified: validate,
+              idVerificationDocs: idDocs,
+              proofOfAddress: proofDocs,
+              landlordLicense: landlordDocs,
+
             });
             console.log("updateUserResponse", updateUserResponse);
             toast.success("Account created! Please check your email to verify your account.");
@@ -184,7 +229,7 @@ const Signup = ({ selectedRole }: SignupProps) => {
     }));
   };
 
-  
+
   return (
     <div className="min-h-screen flex bg-slate-50 font-sans antialiased">
       {/* Left Side - Premium Image Section */}
@@ -374,65 +419,65 @@ const Signup = ({ selectedRole }: SignupProps) => {
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Upload ID */}
-<label className="cursor-pointer">
-  <div className="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:bg-slate-50 transition shadow-sm">
-    <FaUpload className="mx-auto text-gray-400 text-2xl" />
-    <p className="text-sm text-gray-600 mt-2">
-      Upload Photo ID <br />
-      <span className="text-xs text-gray-500">(Passport / Driver’s License)</span>
-    </p>
-    <input
-      type="file"
-      className="hidden"
-      accept="image/*,.pdf"
-      multiple
-      onChange={(e) =>
-        handleVerificationUpload("idVerificationDocs", Array.from(e.target.files || []))
-      }
-    />
-  </div>
-</label>
+                  {/* Upload ID */}
+                  <label className="cursor-pointer">
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:bg-slate-50 transition shadow-sm">
+                      <FaUpload className="mx-auto text-gray-400 text-2xl" />
+                      <p className="text-sm text-gray-600 mt-2">
+                        Upload Photo ID <br />
+                        <span className="text-xs text-gray-500">(Passport / Driver’s License)</span>
+                      </p>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*,.pdf"
+                        multiple
+                        onChange={(e) =>
+                          handleVerificationUpload("idVerificationDocs", Array.from(e.target.files || []))
+                        }
+                      />
+                    </div>
+                  </label>
 
-{/* Proof of Address */}
-<label className="cursor-pointer">
-  <div className="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:bg-slate-50 transition shadow-sm">
-    <FaUpload className="mx-auto text-gray-400 text-2xl" />
-    <p className="text-sm text-gray-600 mt-2">
-      Upload Proof of Address <br />
-      <span className="text-xs text-gray-500">(Utility Bill, Bank Statement)</span>
-    </p>
-    <input
-      type="file"
-      className="hidden"
-      accept="image/*,.pdf"
-      multiple
-      onChange={(e) =>
-        handleVerificationUpload("proofOfAddress", Array.from(e.target.files || []))
-      }
-    />
-  </div>
-</label>
+                  {/* Proof of Address */}
+                  <label className="cursor-pointer">
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:bg-slate-50 transition shadow-sm">
+                      <FaUpload className="mx-auto text-gray-400 text-2xl" />
+                      <p className="text-sm text-gray-600 mt-2">
+                        Upload Proof of Address <br />
+                        <span className="text-xs text-gray-500">(Utility Bill, Bank Statement)</span>
+                      </p>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*,.pdf"
+                        multiple
+                        onChange={(e) =>
+                          handleVerificationUpload("proofOfAddress", Array.from(e.target.files || []))
+                        }
+                      />
+                    </div>
+                  </label>
 
-{/* Landlord License */}
-<label className="cursor-pointer sm:col-span-2">
-  <div className="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:bg-slate-50 transition shadow-sm">
-    <FaUpload className="mx-auto text-gray-400 text-2xl" />
-    <p className="text-sm text-gray-600 mt-2">
-      Upload Landlord License / Company Details <br />
-      <span className="text-xs text-gray-500">(Optional)</span>
-    </p>
-    <input
-      type="file"
-      className="hidden"
-      accept="image/*,.pdf"
-      multiple
-      onChange={(e) =>
-        handleVerificationUpload("landlordLicense", Array.from(e.target.files || []))
-      }
-    />
-  </div>
-</label>
+                  {/* Landlord License */}
+                  <label className="cursor-pointer sm:col-span-2">
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-5 text-center hover:bg-slate-50 transition shadow-sm">
+                      <FaUpload className="mx-auto text-gray-400 text-2xl" />
+                      <p className="text-sm text-gray-600 mt-2">
+                        Upload Landlord License / Company Details <br />
+                        <span className="text-xs text-gray-500">(Optional)</span>
+                      </p>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*,.pdf"
+                        multiple
+                        onChange={(e) =>
+                          handleVerificationUpload("landlordLicense", Array.from(e.target.files || []))
+                        }
+                      />
+                    </div>
+                  </label>
 
                 </div>
               </div>

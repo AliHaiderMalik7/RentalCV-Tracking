@@ -42,10 +42,12 @@ export const users = defineTable({
 
 
    // ✅ New optional fields
-   landlordLicense: v.optional(v.array(v.string())),              
-   proofOfAddress: v.optional(v.array(v.string())), 
-   idVerificationDocs: v.optional(v.array(v.string())), 
+   landlordLicense: v.optional(v.array(v.id("_storage"))),              
+   proofOfAddress:  v.optional(v.array(v.id("_storage"))), 
+   idVerificationDocs: v.optional(v.array(v.id("_storage"))), 
 
+
+   verified:v.optional(v.boolean()),
   createdAt: v.optional(v.number()),
 }).index("email", ["email"])
 .index("by_role", ["roles"])

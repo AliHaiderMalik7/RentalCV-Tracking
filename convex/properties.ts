@@ -127,6 +127,21 @@ export const generateUploadUrl = mutation({
     },
 });
 
+export const generateUrl = mutation({
+    handler: async (ctx) => {
+      // Allow uploads without authentication
+      return await ctx.storage.generateUploadUrl();
+    },
+  });
+
+  export const generateFileUrl = query({
+    args: { storageId: v.id("_storage") },
+    handler: async (ctx, args) => {
+      return await ctx.storage.getUrl(args.storageId);
+    },
+  });
+
+
 export const getById = query({
     args: { propertyId: v.id("properties") },
     handler: async (ctx, args) => {
