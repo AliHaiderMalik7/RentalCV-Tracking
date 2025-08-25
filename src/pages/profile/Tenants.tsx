@@ -51,35 +51,35 @@ const Tenants = () => {
 
     const handleAddTenant = async (e: React.FormEvent) => {
         e.preventDefault();
-        try {
-            await createTenant({
-                firstName: formData.firstName,
-                lastName: formData.lastName,
-                email: formData.email,
-                phone: formData.phone,
-                address: formData.address,
-                city: formData.city,
-                startDate: formData.startDate,
-                endDate: formData.endDate,
-                rentAmount: parseFloat(formData.rentAmount),
-                depositAmount: formData.depositAmount ? parseFloat(formData.depositAmount) : undefined
-            });
-            setShowAddForm(false);
-            setFormData({
-                startDate: '',
-                endDate: '',
-                rentAmount: '',
-                depositAmount: '',
-                firstName: '',
-                lastName: '',
-                email: '',
-                phone: '',
-                address: '',
-                city: ''
-            });
-        } catch (error) {
-            console.error('Error creating tenant:', error);
-        }
+        // try {
+        //     await createTenant({
+        //         firstName: formData.firstName,
+        //         lastName: formData.lastName,
+        //         email: formData.email,
+        //         phone: formData.phone,
+        //         address: formData.address,
+        //         city: formData.city,
+        //         startDate: formData.startDate,
+        //         endDate: formData.endDate,
+        //         rentAmount: parseFloat(formData.rentAmount),
+        //         depositAmount: formData.depositAmount ? parseFloat(formData.depositAmount) : undefined
+        //     });
+        //     setShowAddForm(false);
+        //     setFormData({
+        //         startDate: '',
+        //         endDate: '',
+        //         rentAmount: '',
+        //         depositAmount: '',
+        //         firstName: '',
+        //         lastName: '',
+        //         email: '',
+        //         phone: '',
+        //         address: '',
+        //         city: ''
+        //     });
+        // } catch (error) {
+        //     console.error('Error creating tenant:', error);
+        // }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -65,20 +65,20 @@ export const checkUserExists = mutation({
 export const updateUser = mutation({
   args: {
     email: v.string(),
-    firstName: v.string(),
-    lastName: v.string(),
-    phone: v.string(),
-    gender: v.union(v.literal("male"), v.literal("female"), v.literal("other")),
-    address: v.optional(v.string()),
-    city: v.string(),
-    state: v.string(),
-    postalCode: v.string(),
-    roles: v.union(
-      v.literal("tenant"),
-      v.literal("landlord"),
-      v.literal("admin")
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    gender: v.optional(
+      v.union(v.literal("male"), v.literal("female"), v.literal("other"))
     ),
-    createdAt: v.number(),
+    address: v.optional(v.string()),
+    city: v.optional(v.string()),
+    state: v.optional(v.string()),
+    postalCode: v.optional(v.string()),
+    roles: v.optional(
+      v.union(v.literal("tenant"), v.literal("landlord"), v.literal("admin"))
+    ),
+    createdAt: v.optional(v.number()),
 
     // ✅ New optional landlord verification fields
     idVerificationDocs: v.optional(v.array(v.id("_storage"))),
