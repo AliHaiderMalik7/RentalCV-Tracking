@@ -50,9 +50,30 @@ export const create = mutation({
     },
     handler: async (ctx, args) => {
         const userId = await getAuthUserId(ctx);
+        const normalizedAddress = args.addressLine1.trim().toLowerCase();
+        const normalizedPostcode = args.postcode.trim().toLowerCase();
+
+        console.log("adddresss", normalizedAddress, normalizedPostcode);
+        
         if (!userId) {
-            throw new Error("User must be authenticated to create a property");
-        }
+            return { success: false, error: "❌ User must be authenticated" };
+          }
+        // Check if property exists with same address + postcode
+        const existing = await ctx.db
+        .query("properties")
+        .withIndex("by_postcode_address", (q) =>
+          q.eq("postcode", args.postcode ).eq("addressLine1", args.addressLine1)
+        )
+        .first();
+
+        console.log("existing", existing);
+        
+
+
+            if (existing) {
+                return { success: false, error: "⚠️ A property already exists at this address." };
+              }
+
 
         const propertyId = await ctx.db.insert("properties", {
             landlordId: userId,
@@ -78,7 +99,11 @@ export const create = mutation({
             occupancyStatus: args.occupancyStatus,
         });
 
-        return propertyId;
+        return {
+            success: true,
+            message: "Property created successfully!",
+            propertyId,
+          };
     },
 });
 
@@ -129,17 +154,17 @@ export const generateUploadUrl = mutation({
 
 export const generateUrl = mutation({
     handler: async (ctx) => {
-      // Allow uploads without authentication
-      return await ctx.storage.generateUploadUrl();
+        // Allow uploads without authentication
+        return await ctx.storage.generateUploadUrl();
     },
-  });
+});
 
-  export const generateFileUrl = query({
+export const generateFileUrl = query({
     args: { storageId: v.id("_storage") },
     handler: async (ctx, args) => {
-      return await ctx.storage.getUrl(args.storageId);
+        return await ctx.storage.getUrl(args.storageId);
     },
-  });
+});
 
 
 export const getById = query({
@@ -247,6 +272,9 @@ export const deleteProperty = mutation({
         if (!property) {
             throw new Error("Property not found");
         }
+
+        console.log("property and lanlord", property.landlordId, userId, property, args.propertyId);
+        
 
         if (property.landlordId !== userId) {
             throw new Error("Unauthorized to delete this property");

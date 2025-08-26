@@ -9,22 +9,23 @@ import { initialPropertyFormData, PropertyFormData } from '@/types/property';
 import { api } from '../../../convex/_generated/api';
 import { generateUploadUrl } from '../../../convex/properties';
 import { Id } from '../../../convex/_generated/dataModel';
+import { toast, ToastContainer } from 'react-toastify';
 
 
 
 const Properties = () => {
-    // const user = useQuery(api.auth.getCurrentUser);
-    // const properties = useQuery(api.properties.getByLandlord, { landlordId: user?._id });
-    // const addProperty = useMutation(api.properties.create);
+ 
     const [activeTab, setActiveTab] = useState('properties');
     const [isAddingProperty, setIsAddingProperty] = useState(false);
     const [formData, setFormData] = useState<PropertyFormData>(initialPropertyFormData);
     const addProperty = useMutation(api.properties.create);
     const generateUploadUrl = useMutation(api.properties.generateUploadUrl);
+
+    const deleteProperty = useMutation(api.properties.deleteProperty);
     const properties = useQuery(api.properties.getByLandlord);
 
-    console.log("proooooooo", properties);
 
+   
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const initialFormData: PropertyFormData = {
@@ -44,9 +45,20 @@ const Properties = () => {
         description: '',
         photos: [],
         documents: [],
-        rent:0,
-        occupancyStatus:'vacant'
+        rent: 0,
+        occupancyStatus: 'vacant'
     };
+
+
+    const handleDelete = async (propertyId: any) => {        
+        try {
+          await deleteProperty({ propertyId });
+          toast.success("Property deleted successfully");
+
+        } catch (error) {
+          toast.error(`Failed to delete property`);
+        }
+      };
 
     const handleAddProperty = async () => {
         setIsSubmitting(true);
@@ -76,9 +88,12 @@ const Properties = () => {
             };
 
 
-            console.log("logged property data is ", propertyData)
-            await addProperty(propertyData);
-
+            const response: any = await addProperty(propertyData);
+            if (response.success) {
+                toast.success(response.message);
+            } else {
+                toast.error(response.error);
+            }
             // Reset form and close modal
             setFormData(initialPropertyFormData);
             setIsAddingProperty(false);
@@ -91,9 +106,7 @@ const Properties = () => {
             setIsSubmitting(false);
         }
     };
-    const handleTabChange = (tab: string) => {
-        setActiveTab(tab);
-    };
+  
 
     const handleFormChange = (newData: PropertyFormData) => {
         setFormData(newData);
@@ -126,6 +139,7 @@ const Properties = () => {
         <div className="">
             {/* Sidebar */}
 
+            <ToastContainer />
 
             {/* Main Content */}
             <div className="">
@@ -161,7 +175,8 @@ const Properties = () => {
                                 key={property.id}
                                 property={property}
                                 showActions={true}
-                            />
+                                onDelete={() => handleDelete(property._id)}
+                                />
                         ))}
                     </div>
 
