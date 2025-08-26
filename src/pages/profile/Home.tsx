@@ -41,7 +41,7 @@ const ProfilePage = () => {
                 <div className="max-w-7xl mx-auto">
                     {activeTab === "profile" && <ProfileView user={user} onEditProfile={handleEditProfile} />
                     }
-                    {/* {activeTab === "properties" && <Properties/>} */}
+                    {activeTab === "properties" && <Properties/>}
                     {/* {activeTab === "dashboard" && <LandlordDashboard/>} */}
 
                     {/* {activeTab === "dashboard" && <TenantDashboard/>} */}
