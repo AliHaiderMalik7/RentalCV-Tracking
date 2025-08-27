@@ -9,13 +9,23 @@ import {
 } from 'react-icons/fa';
 import { useState } from 'react';
 
+interface Review {
+  rating: number;
+  // ...other fields
+}
+
 export const PropertyCard = ({ property, showActions = false, onEdit, onDelete, onViewMedia }:any) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   
-  const averageRating = property.reviews?.length
-    ? (property.reviews.reduce((sum, r) => sum + r.rating, 0) / property.reviews.length).toFixed(1)
-    : null;
+  const averageRating: number | null = property.reviews?.length
+  ? parseFloat(
+      (
+        property.reviews.reduce((sum: number, r: Review) => sum + r.rating, 0) /
+        property.reviews.length
+      ).toFixed(1)
+    )
+  : null;
 
   // Count media items
   const photoCount = property.imageUrls?.length || property.images?.length || 0;

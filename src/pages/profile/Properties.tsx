@@ -1,13 +1,10 @@
 // src/pages/Properties.tsx
 import { useState } from 'react';
-import Sidebar from "@/components/Sidebar";
 import { useQuery, useMutation } from "convex/react";
 import { PropertyForm } from '../../components/home/landlord/properties/PropertyForm';
-// import {properties} from "../../../utils/data"
 import { PropertyCard } from '../../components/home/landlord/properties/PropertyCard';
 import { initialPropertyFormData, PropertyFormData } from '@/types/property';
 import { api } from '../../../convex/_generated/api';
-import { generateUploadUrl } from '../../../convex/properties';
 import { Id } from '../../../convex/_generated/dataModel';
 import { toast, ToastContainer } from 'react-toastify';
 import Modal from '@/components/common/Modal';
@@ -16,22 +13,14 @@ import UpdatePropertyForm from '@/components/home/landlord/properties/UpdateProp
 
 
 const Properties = () => {
-
-    const [activeTab, setActiveTab] = useState('properties');
     const [isAddingProperty, setIsAddingProperty] = useState(false);
     const [formData, setFormData] = useState<PropertyFormData>(initialPropertyFormData);
     const [selectedProperty, setSelectedProperty] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-
     const addProperty = useMutation(api.properties.create);
     const generateUploadUrl = useMutation(api.properties.generateUploadUrl);
-
     const deleteProperty = useMutation(api.properties.deleteProperty);
     const properties = useQuery(api.properties.getByLandlord);
-
-
-
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const initialFormData: PropertyFormData = {
@@ -153,18 +142,37 @@ const Properties = () => {
             <ToastContainer />
 
             <Modal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                title="Update Property"
-            >
-                {selectedProperty && (
-                    <UpdatePropertyForm
-                        property={selectedProperty}
-                        // onSubmit={handleUpdateSubmit}
-                        onCancel={() => setIsModalOpen(false)}
-                    />
-                )}
-            </Modal>
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  title="Update Property"
+  footer={
+    <>
+      <button
+        type="button"
+        onClick={() => setIsModalOpen(false)}
+        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        form="updateForm" // 👈 link button to form by id
+        disabled={isSubmitting}
+        className="px-4 py-2 bg-[#0369a1] text-white rounded-md hover:bg-[#075985] disabled:opacity-50"
+      >
+        {isSubmitting ? "Updating..." : "Update Property"}
+      </button>
+    </>
+  }
+>
+  {selectedProperty && (
+    <UpdatePropertyForm
+      property={selectedProperty}
+    //   onSubmit={handleUpdateSubmit}
+      isSubmitting={isSubmitting}
+    />
+  )}
+</Modal>
 
             {/* Main Content */}
             <div className="">

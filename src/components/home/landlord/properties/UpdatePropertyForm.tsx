@@ -231,7 +231,7 @@ const UpdatePropertyForm = ({
       </div>
 
       {/* Buttons */}
-      <div className="flex justify-end space-x-3">
+      {/* <div className="flex justify-end space-x-3">
         <button
           type="button"
           onClick={onCancel}
@@ -246,7 +246,7 @@ const UpdatePropertyForm = ({
         >
           {isSubmitting ? "Updating..." : "Update Property"}
         </button>
-      </div>
+      </div> */}
     </form>
   );
 };
