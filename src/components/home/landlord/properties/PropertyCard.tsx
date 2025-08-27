@@ -3,13 +3,13 @@ import { MediaButton } from '@/components/common/MediaButton';
 import { Tag } from '@/components/common/Tag';
 import {
   FaHome, FaEdit, FaTrash, FaBed, FaBath,
-  FaUtensils, FaCouch, FaCar, FaTree, FaStar,
+  FaUtensils, FaCar, FaTree, FaStar,
   FaCamera, FaFileAlt, FaDoorOpen, FaHammer, FaBan,
   FaExclamationTriangle
 } from 'react-icons/fa';
 import { useState } from 'react';
 
-export const PropertyCard = ({ property, showActions = false, onEdit, onDelete, onViewMedia }) => {
+export const PropertyCard = ({ property, showActions = false, onEdit, onDelete, onViewMedia }:any) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   

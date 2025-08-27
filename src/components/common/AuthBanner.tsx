@@ -1,5 +1,3 @@
-import React from 'react';
-
 const AuthBanner = ({ 
   imageSrc, 
   altText = "Luxury property",
@@ -11,7 +9,6 @@ const AuthBanner = ({
 }:any) => {
   return (
     < >
-      {/* Image Container */}
       <div className="flex-1 flex items-center justify-center max-w-full max-h-[70vh]">
         <img
           src={imageSrc}
@@ -20,7 +17,6 @@ const AuthBanner = ({
         />
       </div>
 
-      {/* Text Container */}
       <div className="w-full max-w-3xl mx-auto mt-8 mb-12">
         <div className="border-l-4 pl-6" style={{ borderColor }}>
           <h1 className="text-5xl font-light mb-3 tracking-tight" style={{ color: titleColor }}>

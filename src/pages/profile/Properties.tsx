@@ -10,14 +10,20 @@ import { api } from '../../../convex/_generated/api';
 import { generateUploadUrl } from '../../../convex/properties';
 import { Id } from '../../../convex/_generated/dataModel';
 import { toast, ToastContainer } from 'react-toastify';
+import Modal from '@/components/common/Modal';
+import UpdatePropertyForm from '@/components/home/landlord/properties/UpdatePropertyForm';
 
 
 
 const Properties = () => {
- 
+
     const [activeTab, setActiveTab] = useState('properties');
     const [isAddingProperty, setIsAddingProperty] = useState(false);
     const [formData, setFormData] = useState<PropertyFormData>(initialPropertyFormData);
+    const [selectedProperty, setSelectedProperty] = useState<any>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+
     const addProperty = useMutation(api.properties.create);
     const generateUploadUrl = useMutation(api.properties.generateUploadUrl);
 
@@ -25,7 +31,7 @@ const Properties = () => {
     const properties = useQuery(api.properties.getByLandlord);
 
 
-   
+
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const initialFormData: PropertyFormData = {
@@ -50,15 +56,20 @@ const Properties = () => {
     };
 
 
-    const handleDelete = async (propertyId: any) => {        
+    const handleEditProperty = (property: any) => {
+        setSelectedProperty(property);
+        setIsModalOpen(true);
+    };
+
+    const handleDelete = async (propertyId: any) => {
         try {
-          await deleteProperty({ propertyId });
-          toast.success("Property deleted successfully");
+            await deleteProperty({ propertyId });
+            toast.success("Property deleted successfully");
 
         } catch (error) {
-          toast.error(`Failed to delete property`);
+            toast.error(`Failed to delete property`);
         }
-      };
+    };
 
     const handleAddProperty = async () => {
         setIsSubmitting(true);
@@ -106,7 +117,7 @@ const Properties = () => {
             setIsSubmitting(false);
         }
     };
-  
+
 
     const handleFormChange = (newData: PropertyFormData) => {
         setFormData(newData);
@@ -141,6 +152,20 @@ const Properties = () => {
 
             <ToastContainer />
 
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Update Property"
+            >
+                {selectedProperty && (
+                    <UpdatePropertyForm
+                        property={selectedProperty}
+                        // onSubmit={handleUpdateSubmit}
+                        onCancel={() => setIsModalOpen(false)}
+                    />
+                )}
+            </Modal>
+
             {/* Main Content */}
             <div className="">
                 <div className="max-w-7xl mx-auto">
@@ -172,11 +197,12 @@ const Properties = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {properties?.map(property => (
                             <PropertyCard
-                                key={property.id}
+                                key={property?.id}
                                 property={property}
                                 showActions={true}
                                 onDelete={() => handleDelete(property._id)}
-                                />
+                                onEdit={() => handleEditProperty(property)}
+                            />
                         ))}
                     </div>
 
