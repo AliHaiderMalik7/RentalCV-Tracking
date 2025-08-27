@@ -19,6 +19,8 @@ const Properties = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const addProperty = useMutation(api.properties.create);
     const generateUploadUrl = useMutation(api.properties.generateUploadUrl);
+    const updateProperty = useMutation(api.properties.update);
+
     const deleteProperty = useMutation(api.properties.deleteProperty);
     const properties = useQuery(api.properties.getByLandlord);
 
@@ -98,7 +100,6 @@ const Properties = () => {
             setFormData(initialPropertyFormData);
             setIsAddingProperty(false);
 
-            console.log("Property added successfully!");
         } catch (error) {
             console.error('Error adding property:', error);
             // You can add a toast notification here
@@ -135,6 +136,27 @@ const Properties = () => {
         return Promise.all(uploadPromises);
     };
 
+    const handleUpdateSubmit = async (updatedData: any) => {
+        if (!selectedProperty) return;
+        try {
+            setIsSubmitting(true);
+            const { _creationTime, _id, createdAt, documents, imageUrls, isActive, landlordId, occupancyStatus, ...dataWithoutCreationTime } = updatedData;
+            await updateProperty({
+                propertyId: selectedProperty._id,
+                ...dataWithoutCreationTime,
+            });
+
+
+            toast.success("Property updated successfully!");
+            setIsModalOpen(false);
+        } catch (err) {
+            console.error("Update failed", err);
+            toast.error("Failed to update property. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <div className="">
             {/* Sidebar */}
@@ -142,37 +164,19 @@ const Properties = () => {
             <ToastContainer />
 
             <Modal
-  isOpen={isModalOpen}
-  onClose={() => setIsModalOpen(false)}
-  title="Update Property"
-  footer={
-    <>
-      <button
-        type="button"
-        onClick={() => setIsModalOpen(false)}
-        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-      >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        form="updateForm" // 👈 link button to form by id
-        disabled={isSubmitting}
-        className="px-4 py-2 bg-[#0369a1] text-white rounded-md hover:bg-[#075985] disabled:opacity-50"
-      >
-        {isSubmitting ? "Updating..." : "Update Property"}
-      </button>
-    </>
-  }
->
-  {selectedProperty && (
-    <UpdatePropertyForm
-      property={selectedProperty}
-    //   onSubmit={handleUpdateSubmit}
-      isSubmitting={isSubmitting}
-    />
-  )}
-</Modal>
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Update Property"
+            >
+                {selectedProperty && (
+                    <UpdatePropertyForm
+                        property={selectedProperty}
+                        isSubmitting={isSubmitting}
+                        onSubmit={handleUpdateSubmit}
+                        onCancel={() => setIsModalOpen(false)}
+                    />
+                )}
+            </Modal>
 
             {/* Main Content */}
             <div className="">

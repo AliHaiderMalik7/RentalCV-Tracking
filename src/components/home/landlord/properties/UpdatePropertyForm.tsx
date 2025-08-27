@@ -5,9 +5,6 @@ import {
   FaHome,
   FaTree,
   FaPoundSign,
-  FaDoorOpen,
-  FaHammer,
-  FaBan,
 } from "react-icons/fa";
 
 interface UpdatePropertyFormProps {
@@ -58,50 +55,70 @@ const UpdatePropertyForm = ({
             <FaHome className="mr-2 text-[#0369a1]" /> Address Details
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="addressLine1"
-              placeholder="Address Line 1"
-              value={formData.addressLine1 || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
-            />
-            <input
-              type="text"
-              name="addressLine2"
-              placeholder="Address Line 2"
-              value={formData.addressLine2 || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-            <input
-              type="text"
-              name="city"
-              placeholder="City"
-              value={formData.city || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
-            />
-            <input
-              type="text"
-              name="county"
-              placeholder="County"
-              value={formData.county || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
-            />
-            <input
-              type="text"
-              name="postcode"
-              placeholder="Postcode"
-              value={formData.postcode || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
-            />
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Address Line 1*
+              </label>
+              <input
+                type="text"
+                name="addressLine1"
+                value={formData.addressLine1 || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Address Line 2
+              </label>
+              <input
+                type="text"
+                name="addressLine2"
+                value={formData.addressLine2 || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                City*
+              </label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                County*
+              </label>
+              <input
+                type="text"
+                name="county"
+                value={formData.county || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Postcode*
+              </label>
+              <input
+                type="text"
+                name="postcode"
+                value={formData.postcode || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
           </div>
         </div>
 
@@ -109,49 +126,74 @@ const UpdatePropertyForm = ({
         <div className="space-y-2 md:col-span-2">
           <h3 className="text-lg font-medium text-gray-900">Property Details</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <select
-              name="propertyType"
-              value={formData.propertyType || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="flat">Flat</option>
-              <option value="house">House</option>
-              <option value="bungalow">Bungalow</option>
-              <option value="other">Other</option>
-            </select>
-            <input
-              type="number"
-              name="bedrooms"
-              min="1"
-              value={formData.bedrooms || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-            <input
-              type="number"
-              name="bathrooms"
-              min="1"
-              value={formData.bathrooms || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-            <input
-              type="number"
-              name="livingRooms"
-              min="0"
-              value={formData.livingRooms || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-            <input
-              type="number"
-              name="kitchens"
-              min="1"
-              value={formData.kitchens || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Property Type*
+              </label>
+              <select
+                name="propertyType"
+                value={formData.propertyType || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="flat">Flat</option>
+                <option value="house">House</option>
+                <option value="bungalow">Bungalow</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Bedrooms*
+              </label>
+              <input
+                type="number"
+                name="bedrooms"
+                min="1"
+                value={formData.bedrooms || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Bathrooms*
+              </label>
+              <input
+                type="number"
+                name="bathrooms"
+                min="1"
+                value={formData.bathrooms || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Living Rooms
+              </label>
+              <input
+                type="number"
+                name="livingRooms"
+                min="0"
+                value={formData.livingRooms || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Kitchens
+              </label>
+              <input
+                type="number"
+                name="kitchens"
+                min="1"
+                value={formData.kitchens || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
           </div>
         </div>
 
@@ -161,25 +203,34 @@ const UpdatePropertyForm = ({
             <FaPoundSign className="mr-2 text-[#0369a1]" /> Rental Information
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="number"
-              name="rent"
-              placeholder="Monthly Rent"
-              value={formData.rent || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-            <select
-              name="occupancyStatus"
-              value={formData.occupancyStatus || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="vacant">Vacant</option>
-              <option value="occupied">Occupied</option>
-              <option value="maintenance">Maintenance</option>
-              <option value="unavailable">Unavailable</option>
-            </select>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Monthly Rent (£)*
+              </label>
+              <input
+                type="number"
+                name="rent"
+                value={formData.rent || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Occupancy Status*
+              </label>
+              <select
+                name="occupancyStatus"
+                value={formData.occupancyStatus || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="vacant">Vacant</option>
+                <option value="occupied">Occupied</option>
+                <option value="maintenance">Maintenance</option>
+                <option value="unavailable">Unavailable</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -201,17 +252,22 @@ const UpdatePropertyForm = ({
                 Has Garden
               </label>
             </div>
-            <select
-              name="parkingType"
-              value={formData.parkingType || ""}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            >
-              <option value="street">Street Parking</option>
-              <option value="driveway">Driveway</option>
-              <option value="garage">Garage</option>
-              <option value="none">No Parking</option>
-            </select>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">
+                Parking Type
+              </label>
+              <select
+                name="parkingType"
+                value={formData.parkingType || ""}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              >
+                <option value="street">Street Parking</option>
+                <option value="driveway">Driveway</option>
+                <option value="garage">Garage</option>
+                <option value="none">No Parking</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -231,7 +287,7 @@ const UpdatePropertyForm = ({
       </div>
 
       {/* Buttons */}
-      {/* <div className="flex justify-end space-x-3">
+      <div className="sticky flex justify-end space-x-3">
         <button
           type="button"
           onClick={onCancel}
@@ -242,11 +298,12 @@ const UpdatePropertyForm = ({
         <button
           type="submit"
           disabled={isSubmitting}
+          onClick={handleSubmit}
           className="px-4 py-2 bg-[#0369a1] text-white rounded-md hover:bg-[#075985] disabled:opacity-50"
         >
           {isSubmitting ? "Updating..." : "Update Property"}
         </button>
-      </div> */}
+      </div>
     </form>
   );
 };

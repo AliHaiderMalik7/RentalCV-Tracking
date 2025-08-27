@@ -8,24 +8,25 @@ import {
   FaExclamationTriangle
 } from 'react-icons/fa';
 import { useState } from 'react';
+import moment from "moment";
 
 interface Review {
   rating: number;
   // ...other fields
 }
 
-export const PropertyCard = ({ property, showActions = false, onEdit, onDelete, onViewMedia }:any) => {
+export const PropertyCard = ({ property, showActions = false, onEdit, onDelete, onViewMedia }: any) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   const averageRating: number | null = property.reviews?.length
-  ? parseFloat(
+    ? parseFloat(
       (
         property.reviews.reduce((sum: number, r: Review) => sum + r.rating, 0) /
         property.reviews.length
       ).toFixed(1)
     )
-  : null;
+    : null;
 
   // Count media items
   const photoCount = property.imageUrls?.length || property.images?.length || 0;
@@ -60,16 +61,15 @@ export const PropertyCard = ({ property, showActions = false, onEdit, onDelete, 
                   </span>
                 )}
                 {property.occupancyStatus && (
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    property.occupancyStatus === 'occupied' ? 'bg-blue-100 text-blue-800' :
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${property.occupancyStatus === 'occupied' ? 'bg-blue-100 text-blue-800' :
                     property.occupancyStatus === 'vacant' ? 'bg-green-100 text-green-800' :
-                    property.occupancyStatus === 'maintenance' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
+                      property.occupancyStatus === 'maintenance' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                    }`}>
                     {property.occupancyStatus === 'occupied' ? <FaDoorOpen className="mr-1" /> :
-                    property.occupancyStatus === 'vacant' ? <FaHome className="mr-1" /> :
-                    property.occupancyStatus === 'maintenance' ? <FaHammer className="mr-1" /> :
-                    <FaBan className="mr-1" />}
+                      property.occupancyStatus === 'vacant' ? <FaHome className="mr-1" /> :
+                        property.occupancyStatus === 'maintenance' ? <FaHammer className="mr-1" /> :
+                          <FaBan className="mr-1" />}
                     {property.occupancyStatus.charAt(0).toUpperCase() + property.occupancyStatus.slice(1)}
                   </span>
                 )}
@@ -78,6 +78,13 @@ export const PropertyCard = ({ property, showActions = false, onEdit, onDelete, 
               <p className="text-sm font-medium text-gray-700">
                 {property.city}, {property.postcode}
               </p>
+
+              {property._creationTime && (
+                <p className="text-xs text-gray-500">
+                  Added {moment(property._creationTime).fromNow()}
+                  {/* e.g. "Added 3 days ago" */}
+                </p>
+              )}
             </div>
 
             {averageRating && (
@@ -174,42 +181,42 @@ export const PropertyCard = ({ property, showActions = false, onEdit, onDelete, 
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-  <div className="fixed inset-0 bg-white/70 dark:bg-gray-900/70 flex items-center justify-center p-4 z-50 backdrop-blur-[0.5px]">
-    <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-xl border border-gray-200 dark:border-gray-800">
-      <div className="flex items-start">
-        <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30">
-          <FaExclamationTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
-        </div>
-        <div className="ml-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Delete property</h3>
-          <div className="mt-2">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Are you sure you want to delete this property? This action cannot be undone.
-            </p>
+        <div className="fixed inset-0 bg-white/70 dark:bg-gray-900/70 flex items-center justify-center p-4 z-50 backdrop-blur-[0.5px]">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6 shadow-xl border border-gray-200 dark:border-gray-800">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30">
+                <FaExclamationTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Delete property</h3>
+                <div className="mt-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Are you sure you want to delete this property? This action cannot be undone.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-5 sm:mt-6 flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors"
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="mt-5 sm:mt-6 flex justify-end space-x-3">
-        <button
-          type="button"
-          onClick={() => setShowDeleteModal(false)}
-          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          disabled={isDeleting}
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={confirmDelete}
-          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors"
-          disabled={isDeleting}
-        >
-          {isDeleting ? 'Deleting...' : 'Delete'}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </>
   );
 };

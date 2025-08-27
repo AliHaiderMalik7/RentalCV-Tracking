@@ -202,63 +202,85 @@ export const getById = query({
 
 export const update = mutation({
     args: {
-        propertyId: v.id("properties"),
-        addressLine1: v.optional(v.string()),
-        addressLine2: v.optional(v.string()),
-        city: v.optional(v.string()),
-        county: v.optional(v.string()),
-        postcode: v.optional(v.string()),
-        propertyType: v.optional(v.union(
-            v.literal("flat"),
-            v.literal("house"),
-            v.literal("bungalow"),
-            v.literal("other")
-        )),
-        bedrooms: v.optional(v.number()),
-        bathrooms: v.optional(v.number()),
-        livingRooms: v.optional(v.number()),
-        kitchens: v.optional(v.number()),
-        hasGarden: v.optional(v.boolean()),
-        parkingType: v.optional(v.union(
-            v.literal("street"),
-            v.literal("driveway"),
-            v.literal("garage"),
-            v.literal("none")
-        )),
-        epcRating: v.optional(v.union(
-            v.literal("A"),
-            v.literal("B"),
-            v.literal("C"),
-            v.literal("D"),
-            v.literal("E"),
-            v.literal("F"),
-            v.literal("G")
-        )),
-        images: v.optional(v.array(v.id("_storage"))),
-        documents: v.optional(v.array(v.id("_storage"))),
-        isActive: v.optional(v.boolean()),
+      propertyId: v.id("properties"),
+      addressLine1: v.optional(v.string()),
+      addressLine2: v.optional(v.string()),
+      city: v.optional(v.string()),
+      county: v.optional(v.string()),
+      postcode: v.optional(v.string()),
+      propertyType: v.optional(
+        v.union(
+          v.literal("flat"),
+          v.literal("house"),
+          v.literal("bungalow"),
+          v.literal("other")
+        )
+      ),
+      bedrooms: v.optional(v.number()),
+      rent: v.optional(v.number()),
+
+      bathrooms: v.optional(v.number()),
+      livingRooms: v.optional(v.number()),
+      kitchens: v.optional(v.number()),
+      hasGarden: v.optional(v.boolean()),
+      parkingType: v.optional(
+        v.union(
+          v.literal("street"),
+          v.literal("driveway"),
+          v.literal("garage"),
+          v.literal("none")
+        )
+      ),
+
+      epcRating: v.optional(v.union(
+        v.literal("A"),
+        v.literal("B"),
+        v.literal("C"),
+        v.literal("D"),
+        v.literal("E"),
+        v.literal("F"),
+        v.literal("G")
+      )),
+      description: v.optional(v.string()),
+      images: v.array(v.id("_storage")), // Array of image IDs
+      documents: v.optional(v.array(v.id("_storage"))),
+      createdAt: v.optional(v.number()),
+      isActive: v.optional(v.boolean()),
+   
+      // You can uncomment these later if needed:
+      // images: v.optional(v.array(v.id("_storage"))),
+      // documents: v.optional(v.array(v.id("_storage"))),
+      // isActive: v.optional(v.boolean()),
     },
     handler: async (ctx, args) => {
-        const userId = await getAuthUserId(ctx);
-        if (!userId) {
-            throw new Error("User must be authenticated");
-        }
-
-        const property = await ctx.db.get(args.propertyId);
-        if (!property) {
-            throw new Error("Property not found");
-        }
-
-        if (property.landlordId !== userId) {
-            throw new Error("Unauthorized to update this property");
-        }
-
-        const { propertyId, ...updateData } = args;
-        await ctx.db.patch(propertyId, updateData);
-
-        return propertyId;
+      const userId = await getAuthUserId(ctx);
+      if (!userId) {
+        throw new Error("User must be authenticated");
+      }
+  
+      const property = await ctx.db.get(args.propertyId);
+      if (!property) {
+        throw new Error("Property not found");
+      }
+  
+      if (property.landlordId !== userId) {
+        throw new Error("Unauthorized to update this property");
+      }
+  
+      // Pick only fields that are defined
+      const { propertyId, ...updateData } = args;
+      const filteredUpdateData = Object.fromEntries(
+        Object.entries(updateData).filter(([_, v]) => v !== undefined)
+      );
+  
+      console.log("updateData", filteredUpdateData, propertyId);
+  
+      await ctx.db.patch(propertyId, filteredUpdateData);
+  
+      return propertyId;
     },
-});
+  });
+  
 
 export const deleteProperty = mutation({
     args: { propertyId: v.id("properties") },

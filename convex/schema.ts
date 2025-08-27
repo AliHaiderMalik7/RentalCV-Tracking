@@ -50,8 +50,8 @@ const applicationTables = {
     description: v.optional(v.string()),
     images: v.array(v.id("_storage")), // Array of image IDs
     documents: v.optional(v.array(v.id("_storage"))),
-    createdAt: v.number(),
-    isActive: v.boolean(),
+    createdAt: v.optional(v.number()),
+    isActive: v.optional(v.boolean()),
   }).index("landlord_properties", ["landlordId"]).index("by_postcode_address", ["postcode", "addressLine1"]),
   
 
