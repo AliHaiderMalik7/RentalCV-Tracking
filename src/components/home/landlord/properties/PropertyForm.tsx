@@ -1,11 +1,9 @@
 // src/components/properties/PropertyForm.tsx
 import { PropertyFormProps } from '@/types/property';
-import { useState } from 'react';
 import { 
   FaCamera, 
   FaFileAlt, 
   FaHome, 
-  FaCar, 
   FaTree, 
   FaPoundSign,
   FaDoorOpen,

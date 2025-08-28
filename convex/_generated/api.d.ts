@@ -20,6 +20,7 @@ import type * as emailVerification from "../emailVerification.js";
 import type * as http from "../http.js";
 import type * as mutations_users_createUser from "../mutations/users/createUser.js";
 import type * as passwordReset_PasswordResetEmail from "../passwordReset/PasswordResetEmail.js";
+import type * as profile from "../profile.js";
 import type * as properties from "../properties.js";
 import type * as users from "../users.js";
 
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "mutations/users/createUser": typeof mutations_users_createUser;
   "passwordReset/PasswordResetEmail": typeof passwordReset_PasswordResetEmail;
+  profile: typeof profile;
   properties: typeof properties;
   users: typeof users;
 }>;

@@ -24,12 +24,10 @@ const ProfilePage = () => {
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
-        // You can add navigation logic here if needed
     };
 
     return (
         <div className="flex min-h-screen bg-slate-100">
-            {/* Sidebar with activeTab and handler */}
             <Sidebar
                 role={user?.roles}
                 activeTab={activeTab}
@@ -42,7 +40,7 @@ const ProfilePage = () => {
                     {activeTab === "profile" && <ProfileView user={user} onEditProfile={handleEditProfile} />
                     }
                     {activeTab === "properties" && <Properties/>}
-                    {/* {activeTab === "dashboard" && <LandlordDashboard/>} */}
+                    {activeTab === "dashboard" && <LandlordDashboard/>}
 
                     {/* {activeTab === "dashboard" && <TenantDashboard/>} */}
                     {activeTab === "tenants" && <Tenants/>}

@@ -1,7 +1,10 @@
 import { formatJoinDate } from "../../../utils/helpers";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { FaCheckCircle } from "react-icons/fa";
+import UpdateProfileForm from "./updateProfile";
+import { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
 interface ProfileViewProps {
     user: any;
@@ -10,16 +13,39 @@ interface ProfileViewProps {
 
 export const ProfileView = ({ user, onEditProfile }: ProfileViewProps) => {
     const currentUser = useQuery(api.auth.getCurrentUser);
+    const updateProfile = useMutation(api.profile.updateProfile); // 🔥 hook for your mutation
+
     const displayUser = user || currentUser;
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-
+    console.log("user", displayUser);
+    
 
     // ✅ check if user is a verified landlord
     const isVerifiedLandlord =
         displayUser?.roles === "landlord" && displayUser?.verified === true;
 
+
+
+        const handleSave = async (updatedUser: any) => {
+            console.log("Updated user:", updatedUser);
+        
+            try {
+              await updateProfile(updatedUser); // pass updated fields
+              toast.success("Profile updated successfully!");
+            } catch (error:any) {
+                toast.error("Failed to update profile:", error);
+            }
+          };
     return (
         <>
+        <ToastContainer/>
+            <UpdateProfileForm
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                user={displayUser}
+                onSave={handleSave}
+            />
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
                 <div>
@@ -72,7 +98,7 @@ export const ProfileView = ({ user, onEditProfile }: ProfileViewProps) => {
 
                 <div className="border-t border-slate-200 px-6 py-4">
                     <button
-                        onClick={onEditProfile}
+                        onClick={() => setIsModalOpen(true)}
                         className="text-emerald-600 hover:text-emerald-700 font-medium cursor-pointer"
                     >
                         Edit Profile
@@ -103,7 +129,7 @@ export const ProfileView = ({ user, onEditProfile }: ProfileViewProps) => {
                             <p className="text-sm text-slate-500">Phone</p>
                             <p className="font-medium">
                                 {displayUser?.phone
-                                    ? `+${displayUser.phone}`
+                                    ? `${displayUser.phone}`
                                     : "Not specified"}
                             </p>
                         </div>
@@ -158,8 +184,8 @@ export const ProfileView = ({ user, onEditProfile }: ProfileViewProps) => {
                             <p className="text-sm text-slate-500">Account Status</p>
                             <p
                                 className={`font-medium ${isVerifiedLandlord
-                                        ? "text-emerald-600"
-                                        : "text-slate-400"
+                                    ? "text-emerald-600"
+                                    : "text-slate-400"
                                     }`}
                             >
                                 {isVerifiedLandlord ? "Verified" : "Not Verified"}

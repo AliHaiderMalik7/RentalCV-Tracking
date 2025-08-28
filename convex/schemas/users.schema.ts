@@ -20,7 +20,7 @@ export const users = defineTable({
   city: v.optional(v.string()),
   state: v.optional(v.string()),
   postalCode: v.optional(v.string()),
-
+  profile: v.optional(v.id("_storage")),  
   roles: v.optional(v.union(
     v.literal("tenant"),
     v.literal("landlord"),

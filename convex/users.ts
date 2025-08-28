@@ -11,20 +11,6 @@ export const getTenants = query({
       throw new Error("User must be authenticated");
     }
 
-    // First verify the requesting user is a landlord or admin
-    // const currentUser = await ctx.db
-    //   .query("users")
-    //   .withIndex("by_userId", (q) => q.eq("userId", userId))
-    //   .unique();
-
-    // if (!currentUser) {
-    //   throw new Error("User not found");
-    // }
-
-    // if (currentUser.role !== "landlord" && currentUser.role !== "admin") {
-    //   throw new Error("Unauthorized - only landlords and admins can view tenants");
-    // }
-
     // Get all users with tenant role
     const tenants = await ctx.db
       .query("users")
