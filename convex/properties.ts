@@ -50,29 +50,19 @@ export const create = mutation({
     },
     handler: async (ctx, args) => {
         const userId = await getAuthUserId(ctx);
-        const normalizedAddress = args.addressLine1.trim().toLowerCase();
-        const normalizedPostcode = args.postcode.trim().toLowerCase();
-
-        console.log("adddresss", normalizedAddress, normalizedPostcode);
-        
         if (!userId) {
             return { success: false, error: "❌ User must be authenticated" };
-          }
-        // Check if property exists with same address + postcode
+        }
         const existing = await ctx.db
-        .query("properties")
-        .withIndex("by_postcode_address", (q) =>
-          q.eq("postcode", args.postcode ).eq("addressLine1", args.addressLine1)
-        )
-        .first();
+            .query("properties")
+            .withIndex("by_postcode_address", (q) =>
+                q.eq("postcode", args.postcode).eq("addressLine1", args.addressLine1)
+            )
+            .first();
 
-        console.log("existing", existing);
-        
-
-
-            if (existing) {
-                return { success: false, error: "⚠️ A property already exists at this address." };
-              }
+        if (existing) {
+            return { success: false, error: "⚠️ A property already exists at this address." };
+        }
 
 
         const propertyId = await ctx.db.insert("properties", {
@@ -103,7 +93,7 @@ export const create = mutation({
             success: true,
             message: "Property created successfully!",
             propertyId,
-          };
+        };
     },
 });
 
@@ -166,7 +156,6 @@ export const generateFileUrl = query({
     },
 });
 
-
 export const getById = query({
     args: { propertyId: v.id("properties") },
     handler: async (ctx, args) => {
@@ -202,85 +191,77 @@ export const getById = query({
 
 export const update = mutation({
     args: {
-      propertyId: v.id("properties"),
-      addressLine1: v.optional(v.string()),
-      addressLine2: v.optional(v.string()),
-      city: v.optional(v.string()),
-      county: v.optional(v.string()),
-      postcode: v.optional(v.string()),
-      propertyType: v.optional(
-        v.union(
-          v.literal("flat"),
-          v.literal("house"),
-          v.literal("bungalow"),
-          v.literal("other")
-        )
-      ),
-      bedrooms: v.optional(v.number()),
-      rent: v.optional(v.number()),
+        propertyId: v.id("properties"),
+        addressLine1: v.optional(v.string()),
+        addressLine2: v.optional(v.string()),
+        city: v.optional(v.string()),
+        county: v.optional(v.string()),
+        postcode: v.optional(v.string()),
+        propertyType: v.optional(
+            v.union(
+                v.literal("flat"),
+                v.literal("house"),
+                v.literal("bungalow"),
+                v.literal("other")
+            )
+        ),
+        bedrooms: v.optional(v.number()),
+        rent: v.optional(v.number()),
 
-      bathrooms: v.optional(v.number()),
-      livingRooms: v.optional(v.number()),
-      kitchens: v.optional(v.number()),
-      hasGarden: v.optional(v.boolean()),
-      parkingType: v.optional(
-        v.union(
-          v.literal("street"),
-          v.literal("driveway"),
-          v.literal("garage"),
-          v.literal("none")
-        )
-      ),
+        bathrooms: v.optional(v.number()),
+        livingRooms: v.optional(v.number()),
+        kitchens: v.optional(v.number()),
+        hasGarden: v.optional(v.boolean()),
+        parkingType: v.optional(
+            v.union(
+                v.literal("street"),
+                v.literal("driveway"),
+                v.literal("garage"),
+                v.literal("none")
+            )
+        ),
 
-      epcRating: v.optional(v.union(
-        v.literal("A"),
-        v.literal("B"),
-        v.literal("C"),
-        v.literal("D"),
-        v.literal("E"),
-        v.literal("F"),
-        v.literal("G")
-      )),
-      description: v.optional(v.string()),
-      images: v.array(v.id("_storage")), // Array of image IDs
-      documents: v.optional(v.array(v.id("_storage"))),
-      createdAt: v.optional(v.number()),
-      isActive: v.optional(v.boolean()),
-   
-      // You can uncomment these later if needed:
-      // images: v.optional(v.array(v.id("_storage"))),
-      // documents: v.optional(v.array(v.id("_storage"))),
-      // isActive: v.optional(v.boolean()),
+        epcRating: v.optional(v.union(
+            v.literal("A"),
+            v.literal("B"),
+            v.literal("C"),
+            v.literal("D"),
+            v.literal("E"),
+            v.literal("F"),
+            v.literal("G")
+        )),
+        description: v.optional(v.string()),
+        images: v.array(v.id("_storage")), // Array of image IDs
+        documents: v.optional(v.array(v.id("_storage"))),
+        createdAt: v.optional(v.number()),
+        isActive: v.optional(v.boolean()),
     },
     handler: async (ctx, args) => {
-      const userId = await getAuthUserId(ctx);
-      if (!userId) {
-        throw new Error("User must be authenticated");
-      }
-  
-      const property = await ctx.db.get(args.propertyId);
-      if (!property) {
-        throw new Error("Property not found");
-      }
-  
-      if (property.landlordId !== userId) {
-        throw new Error("Unauthorized to update this property");
-      }
-  
-      // Pick only fields that are defined
-      const { propertyId, ...updateData } = args;
-      const filteredUpdateData = Object.fromEntries(
-        Object.entries(updateData).filter(([_, v]) => v !== undefined)
-      );
-  
-      console.log("updateData", filteredUpdateData, propertyId);
-  
-      await ctx.db.patch(propertyId, filteredUpdateData);
-  
-      return propertyId;
+        const userId = await getAuthUserId(ctx);
+        if (!userId) {
+            throw new Error("User must be authenticated");
+        }
+
+        const property = await ctx.db.get(args.propertyId);
+        if (!property) {
+            throw new Error("Property not found");
+        }
+
+        if (property.landlordId !== userId) {
+            throw new Error("Unauthorized to update this property");
+        }
+
+        // Pick only fields that are defined
+        const { propertyId, ...updateData } = args;
+        const filteredUpdateData = Object.fromEntries(
+            Object.entries(updateData).filter(([_, v]) => v !== undefined)
+        );
+
+        await ctx.db.patch(propertyId, filteredUpdateData);
+        return propertyId;
     },
-  });
-  
+});
+
 
 export const deleteProperty = mutation({
     args: { propertyId: v.id("properties") },
@@ -294,9 +275,6 @@ export const deleteProperty = mutation({
         if (!property) {
             throw new Error("Property not found");
         }
-
-        console.log("property and lanlord", property.landlordId, userId, property, args.propertyId);
-        
 
         if (property.landlordId !== userId) {
             throw new Error("Unauthorized to delete this property");
