@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
+import { api } from '../../../../../convex/_generated/api';
+import { toast, ToastContainer } from 'react-toastify';
 
 interface TenantFormData {
   propertyId: string;
@@ -20,7 +22,7 @@ interface Property {
 interface AddTenantFormProps {
   onClose: () => void;
   onSuccess: () => void; // Changed from onSubmit to onSuccess
-  properties: Property[];
+  properties: any;
   currentLandlord: {
     id: string;
     name: string;
@@ -34,6 +36,8 @@ export const AddTenantForm = ({
   properties, 
   currentLandlord 
 }: AddTenantFormProps) => {
+  const currentUser = useQuery(api.auth.getCurrentUser);
+
   const [formData, setFormData] = useState<TenantFormData>({
     propertyId: '',
     startDate: '',
@@ -45,19 +49,24 @@ export const AddTenantForm = ({
     mobile: ''
   });
 
+  console.log("current landlord", currentUser);
+  
+
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [invitationStatus, setInvitationStatus] = useState<'idle' | 'pending' | 'sent' | 'error'>('idle');
   const [sendEmail, setSendEmail] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   // Use the addTenancy mutation
-  // const addTenancyMutation = useMutation(api.tenancies.addTenancy);
+  const addTenancyMutation = useMutation(api.tenancy.addTenancy);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
+      console.log("name and value", name,value);
+      
     if (name === 'propertyId') {
-      const property = properties.find(p => p.id === value);
+const property = properties.find(p => p._id === value);
       setSelectedProperty(property || null);
     }
     
@@ -66,6 +75,8 @@ export const AddTenantForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("formData", formData);
+    console.log("properties are", properties);
     
     if (!formData.propertyId || !selectedProperty) {
       alert('Please select a property');
@@ -88,24 +99,31 @@ export const AddTenantForm = ({
       // const inviteTokenExpiry = Date.now() + (14 * 24 * 60 * 60 * 1000);
 
       // // Prepare data for the mutation
-      // const mutationData = {
-      //   propertyId: formData.propertyId,
-      //   startDate: new Date(formData.startDate).getTime(),
-      //   endDate: new Date(formData.endDate).getTime(),
-      //   monthlyRent: parseFloat(formData.rentAmount),
-      //   depositAmount: formData.depositAmount ? parseFloat(formData.depositAmount) : 0,
-      //   name: formData.name,
-      //   email: formData.email,
-      //   mobile: formData.mobile,
-      //   inviteToken,
-      //   inviteTokenExpiry,
-      //   landlordId: currentLandlord.id,
-      //   sendEmail,
-      // };
+      const mutationData = {
+        propertyId: formData.propertyId,
+        startDate: new Date(formData.startDate).getTime(),
+        endDate: new Date(formData.endDate).getTime(),
+        // monthlyRent: parseFloat(formData.rentAmount),
+        // depositAmount: formData.depositAmount ? parseFloat(formData.depositAmount) : 0,
+        name: formData.name,
+        email: formData.email,
+        mobile: formData.mobile,
+        status:"pending",
+        // inviteToken,
+        // inviteTokenExpiry,
+        landlordId: currentUser?._id,
+        // sendEmail,
+      };
 
+      console.log("mutation data", mutationData);
+      
       // // Call the mutation
-      // const result = await addTenancyMutation(mutationData);
+      const result = await addTenancyMutation(mutationData);
 
+
+      if(result.success){
+        toast.success(result.message);
+      }
       // if (sendEmail) {
       //   setInvitationStatus('sent');
       //   // Auto-close after success or let user see success message
@@ -135,6 +153,7 @@ export const AddTenantForm = ({
 
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 mb-6 p-6">
+      <ToastContainer/>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-800">Add New Tenant</h3>
         <button
@@ -171,7 +190,7 @@ export const AddTenantForm = ({
             >
               <option value="">-- Select a property --</option>
               {properties.map(property => (
-                <option key={property.id} value={property.id}>
+                <option key={property.id} value={property._id}>
                   {property.addressLine1}
                 </option>
               ))}

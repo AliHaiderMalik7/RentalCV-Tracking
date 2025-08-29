@@ -18,17 +18,10 @@ export const ProfileView = ({ user, onEditProfile }: ProfileViewProps) => {
     const displayUser = user || currentUser;
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    console.log("user", displayUser);
-    
-
-    // ✅ check if user is a verified landlord
     const isVerifiedLandlord =
         displayUser?.roles === "landlord" && displayUser?.verified === true;
 
-
-
         const handleSave = async (updatedUser: any) => {
-            console.log("Updated user:", updatedUser);
         
             try {
               await updateProfile(updatedUser); // pass updated fields

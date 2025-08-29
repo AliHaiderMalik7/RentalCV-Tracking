@@ -18,8 +18,6 @@ const SettingsPage = () => {
   const user: any = useQuery(api.auth.getCurrentUser);
   const generateUploadUrl = useMutation(api.properties.generateUrl);
   const updateUser = useMutation(api.auth.updateUser);
-  
-  console.log("user data is ", user);
 
   // Local UI-only settings
   const [settings, setSettings] = useState({
@@ -43,9 +41,9 @@ const SettingsPage = () => {
   // Check verification status directly from DB (user)
   const isVerified = Boolean(
     user?.landlordLicense &&
-      user?.landlordLicense.length > 0 &&
-      user?.proofOfAddress?.length > 0 &&
-      user?.idVerificationDocs?.length > 0
+    user?.landlordLicense.length > 0 &&
+    user?.proofOfAddress?.length > 0 &&
+    user?.idVerificationDocs?.length > 0
   );
 
   // Handle file upload for verification documents
@@ -67,10 +65,7 @@ const SettingsPage = () => {
   // Process files and upload to Convex storage
   const processFiles = async (files: File[]): Promise<Id<"_storage">[]> => {
     const uploadPromises = files.map(async (file) => {
-      // Get upload URL
       const postUrl = await generateUploadUrl();
-
-      // Upload file
       const result = await fetch(postUrl, {
         method: "POST",
         headers: { "Content-Type": file.type },
@@ -91,10 +86,9 @@ const SettingsPage = () => {
   // Submit all documents for verification
   const submitVerification = async () => {
     if (uploading) return;
-    
+
     setUploading(true);
     try {
-      // Process all document types
       const [landlordDocs, proofDocs, idDocs] = await Promise.all([
         processFiles(formData.landlordLicense),
         processFiles(formData.proofOfAddress),
@@ -102,19 +96,19 @@ const SettingsPage = () => {
       ]);
 
       let validate = false;
-            if (user.roles === "landlord") {
-              const hasAllDocs =
-                formData.idVerificationDocs.length > 0 &&
-                formData.proofOfAddress.length > 0 &&
-                formData.landlordLicense.length > 0;
+      if (user.roles === "landlord") {
+        const hasAllDocs =
+          formData.idVerificationDocs.length > 0 &&
+          formData.proofOfAddress.length > 0 &&
+          formData.landlordLicense.length > 0;
 
-              validate = hasAllDocs;
-            }
+        validate = hasAllDocs;
+      }
 
 
       // Update user with the new documents
       const updateUserResponse = await updateUser({
-        email:user.email,
+        email: user.email,
         idVerificationDocs: idDocs,
         proofOfAddress: proofDocs,
         landlordLicense: landlordDocs,
@@ -128,21 +122,17 @@ const SettingsPage = () => {
         state: user.state,
         postalCode: user.postalCode,
         roles: user.roles,
-       
+
       });
-      
-      console.log("updateUserResponse", updateUserResponse);
-      
-      // Clear the form data after successful upload
+
       setFormData({
         landlordLicense: [],
         proofOfAddress: [],
         idVerificationDocs: [],
       });
-      
+
       alert("Documents uploaded successfully!");
     } catch (error) {
-      console.error("Error uploading documents:", error);
       alert("Failed to upload documents. Please try again.");
     } finally {
       setUploading(false);
@@ -198,11 +188,10 @@ const SettingsPage = () => {
                 </p>
               </div>
               <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  isVerified
+                className={`px-3 py-1 rounded-full text-sm font-medium ${isVerified
                     ? "bg-green-100 text-green-800"
                     : "bg-yellow-100 text-yellow-800"
-                }`}
+                  }`}
               >
                 {isVerified ? "Verified" : "Pending"}
               </span>
@@ -286,62 +275,61 @@ const SettingsPage = () => {
 
                 {/* Show selected files */}
                 {(formData.landlordLicense.length > 0 ||
-                 formData.proofOfAddress.length > 0 ||
-                 formData.idVerificationDocs.length > 0) && (
-                  <div className="mb-6">
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Selected Files</h3>
-                    <div className="space-y-2">
-                      {formData.landlordLicense.map((file, index) => (
-                        <div key={`landlord-${index}`} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                          <span className="text-sm text-gray-600 truncate">{file.name}</span>
-                          <button 
-                            onClick={() => removeFile("landlordLicense", index)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <FaTimes />
-                          </button>
-                        </div>
-                      ))}
-                      {formData.proofOfAddress.map((file, index) => (
-                        <div key={`proof-${index}`} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                          <span className="text-sm text-gray-600 truncate">{file.name}</span>
-                          <button 
-                            onClick={() => removeFile("proofOfAddress", index)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <FaTimes />
-                          </button>
-                        </div>
-                      ))}
-                      {formData.idVerificationDocs.map((file, index) => (
-                        <div key={`id-${index}`} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                          <span className="text-sm text-gray-600 truncate">{file.name}</span>
-                          <button 
-                            onClick={() => removeFile("idVerificationDocs", index)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <FaTimes />
-                          </button>
-                        </div>
-                      ))}
+                  formData.proofOfAddress.length > 0 ||
+                  formData.idVerificationDocs.length > 0) && (
+                    <div className="mb-6">
+                      <h3 className="text-sm font-medium text-gray-700 mb-2">Selected Files</h3>
+                      <div className="space-y-2">
+                        {formData.landlordLicense.map((file, index) => (
+                          <div key={`landlord-${index}`} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                            <span className="text-sm text-gray-600 truncate">{file.name}</span>
+                            <button
+                              onClick={() => removeFile("landlordLicense", index)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <FaTimes />
+                            </button>
+                          </div>
+                        ))}
+                        {formData.proofOfAddress.map((file, index) => (
+                          <div key={`proof-${index}`} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                            <span className="text-sm text-gray-600 truncate">{file.name}</span>
+                            <button
+                              onClick={() => removeFile("proofOfAddress", index)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <FaTimes />
+                            </button>
+                          </div>
+                        ))}
+                        {formData.idVerificationDocs.map((file, index) => (
+                          <div key={`id-${index}`} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                            <span className="text-sm text-gray-600 truncate">{file.name}</span>
+                            <button
+                              onClick={() => removeFile("idVerificationDocs", index)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <FaTimes />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Submit button */}
                 {(formData.landlordLicense.length > 0 ||
-                 formData.proofOfAddress.length > 0 ||
-                 formData.idVerificationDocs.length > 0) && (
-                  <button
-                    onClick={submitVerification}
-                    disabled={uploading}
-                    className={`w-full py-2 px-4 rounded-md text-white font-medium ${
-                      uploading ? "bg-gray-400" : "bg-[#0369a1] hover:bg-[#075985]"
-                    } transition`}
-                  >
-                    {uploading ? "Uploading..." : "Submit Documents for Verification"}
-                  </button>
-                )}
+                  formData.proofOfAddress.length > 0 ||
+                  formData.idVerificationDocs.length > 0) && (
+                    <button
+                      onClick={submitVerification}
+                      disabled={uploading}
+                      className={`w-full py-2 px-4 rounded-md text-white font-medium ${uploading ? "bg-gray-400" : "bg-[#0369a1] hover:bg-[#075985]"
+                        } transition`}
+                    >
+                      {uploading ? "Uploading..." : "Submit Documents for Verification"}
+                    </button>
+                  )}
               </div>
             )}
           </div>
@@ -387,11 +375,10 @@ const SettingsPage = () => {
                           }));
                         }
                       }}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-r-md transition ${
-                        settings.shareId
+                      className={`flex items-center gap-2 px-4 py-2 rounded-r-md transition ${settings.shareId
                           ? "bg-[#0369a1] hover:bg-[#075985] text-white"
                           : "bg-green-500 hover:bg-green-600 text-white"
-                      }`}
+                        }`}
                     >
                       {settings.shareId ? (
                         <>

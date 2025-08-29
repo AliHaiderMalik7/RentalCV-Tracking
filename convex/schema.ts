@@ -61,8 +61,8 @@ const applicationTables = {
     // tenantId: v.id("users"), // This must be optional for pending invites!
     startDate: v.number(),
     endDate: v.optional(v.number()),
-    monthlyRent: v.number(),
-    depositAmount: v.number(),
+    monthlyRent: v.optional(v.number()),
+    depositAmount: v.optional(v.number()),
     createdAt: v.number(),
 
     // --- NEW FIELDS FOR ONBOARDING & STATUS ---
@@ -76,10 +76,11 @@ const applicationTables = {
     landlordId: v.optional(v.id("users")),
 
     // --- NEW FIELDS FOR INVITATION LOGIC ---
-    inviteToken: v.string(), // The unique token for the invite link
-    inviteTokenExpiry: v.number(), // Timestamp when the token expires (14 days)
-    invitedTenantEmail: v.string(), // The email the invite was sent to
-    invitedTenantName: v.string(), // The name provided by the landlord
+    inviteToken: v.optional(v.string()), // The unique token for the invite link
+    inviteTokenExpiry: v.optional(v.number()), // Timestamp when the token expires (14 days)
+    invitedTenantEmail: v.optional(v.string()), // The email the invite was sent to
+    invitedTenantName: v.optional(v.string()), // The name provided by the landlord
+    
     invitedTenantPhone: v.optional(v.string()), // The phone number provided
 
     // --- NEW FIELDS FOR LEGAL COMPLIANCE ---
@@ -95,13 +96,13 @@ const applicationTables = {
     landlordReviewable: v.optional(v.union(v.boolean(), v.null())),
 
   })
-    .index("tenant_tenancies", ["tenantId"])
+    // .index("tenant_tenancies", ["tenantId"])
     .index("property_tenancies", ["propertyId"])
     // --- NEW INDEXES FOR PERFORMANCE ---
     .index("by_invite_token", ["inviteToken"]) // Critical for looking up invites by token
     .index("by_status", ["status"]) // For filtering dashboards
     .index("by_landlord", ["landlordId"]) // For landlord's dashboard
-    .index("by_tenant_email", ["invitedTenantEmail"]), // For checking if invites already exist
+    .index("by_tenant_email", ["invitedTenantEmail"]), 
 
   reviews: defineTable({
     tenancyId: v.id("tenancies"),
