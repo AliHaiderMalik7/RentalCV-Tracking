@@ -22,6 +22,7 @@ import type * as mutations_users_createUser from "../mutations/users/createUser.
 import type * as passwordReset_PasswordResetEmail from "../passwordReset/PasswordResetEmail.js";
 import type * as profile from "../profile.js";
 import type * as properties from "../properties.js";
+import type * as tenancy from "../tenancy.js";
 import type * as users from "../users.js";
 
 /**
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   "passwordReset/PasswordResetEmail": typeof passwordReset_PasswordResetEmail;
   profile: typeof profile;
   properties: typeof properties;
+  tenancy: typeof tenancy;
   users: typeof users;
 }>;
 export declare const api: FilterApi<
