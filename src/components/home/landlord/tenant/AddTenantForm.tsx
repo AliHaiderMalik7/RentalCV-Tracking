@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMutation, useQuery } from 'convex/react';
+import { useAction, useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../../convex/_generated/api';
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -30,11 +30,11 @@ interface AddTenantFormProps {
   };
 }
 
-export const AddTenantForm = ({ 
-  onClose, 
-  onSuccess, 
-  properties, 
-  currentLandlord 
+export const AddTenantForm = ({
+  onClose,
+  onSuccess,
+  properties,
+  currentLandlord
 }: AddTenantFormProps) => {
   const currentUser = useQuery(api.auth.getCurrentUser);
 
@@ -49,8 +49,10 @@ export const AddTenantForm = ({
     mobile: ''
   });
 
-  console.log("current landlord", currentUser);
-  
+  const sendEmailVerification = useAction(api.tenancy.sendInviteEmail);
+
+
+
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [invitationStatus, setInvitationStatus] = useState<'idle' | 'pending' | 'sent' | 'error'>('idle');
@@ -62,14 +64,14 @@ export const AddTenantForm = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
-      console.log("name and value", name,value);
-      
+
+    console.log("name and value", name, value);
+
     if (name === 'propertyId') {
-const property = properties.find(p => p._id === value);
+      const property = properties.find(p => p._id === value);
       setSelectedProperty(property || null);
     }
-    
+
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -77,7 +79,7 @@ const property = properties.find(p => p._id === value);
     e.preventDefault();
     console.log("formData", formData);
     console.log("properties are", properties);
-    
+
     if (!formData.propertyId || !selectedProperty) {
       alert('Please select a property');
       return;
@@ -94,9 +96,8 @@ const property = properties.find(p => p._id === value);
     setErrorMessage('');
 
     try {
-      // Generate secure token and expiry (14 days from now)
-      // const inviteToken = generateSecureToken();
-      // const inviteTokenExpiry = Date.now() + (14 * 24 * 60 * 60 * 1000);
+   
+      const token = crypto.randomUUID();
 
       // // Prepare data for the mutation
       const mutationData = {
@@ -108,20 +109,23 @@ const property = properties.find(p => p._id === value);
         name: formData.name,
         email: formData.email,
         mobile: formData.mobile,
-        status:"pending",
-        // inviteToken,
+        status: "pending",
+        inviteToken:token,
         // inviteTokenExpiry,
         landlordId: currentUser?._id,
         // sendEmail,
       };
 
       console.log("mutation data", mutationData);
-      
+
       // // Call the mutation
       const result = await addTenancyMutation(mutationData);
 
 
-      if(result.success){
+      if (result.success) {
+       const emailResponse = await sendEmailVerification({ email: formData.email, token });
+       console.log("email response is ", emailResponse);
+       
         toast.success(result.message);
       }
       // if (sendEmail) {
@@ -153,7 +157,7 @@ const property = properties.find(p => p._id === value);
 
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 mb-6 p-6">
-      <ToastContainer/>
+      <ToastContainer />
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-800">Add New Tenant</h3>
         <button
@@ -196,7 +200,7 @@ const property = properties.find(p => p._id === value);
               ))}
             </select>
           </div>
-          
+
           {selectedProperty && (
             <div className="mt-2 p-3 bg-gray-50 rounded-md">
               <p className="text-sm text-gray-600">
@@ -209,7 +213,7 @@ const property = properties.find(p => p._id === value);
         {/* Tenancy Details Section */}
         <div className="mb-6">
           <h4 className="font-medium text-gray-700 mb-3">Tenancy Details</h4>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -285,7 +289,7 @@ const property = properties.find(p => p._id === value);
         {/* Tenant Contact Section */}
         <div className="mb-6">
           <h4 className="font-medium text-gray-700 mb-3">Tenant Contact Info</h4>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -334,7 +338,7 @@ const property = properties.find(p => p._id === value);
         {/* Invite Tenant Section */}
         <div className="mb-6">
           <h4 className="font-medium text-gray-700 mb-3">Invite Tenant</h4>
-          
+
           <div className="space-y-3">
             <div className="flex items-center">
               <input
@@ -349,15 +353,14 @@ const property = properties.find(p => p._id === value);
                 Send Email Invitation
               </label>
             </div>
-            
+
             {invitationStatus !== 'idle' && invitationStatus !== 'error' && (
-              <div className={`text-sm p-2 rounded ${
-                invitationStatus === 'pending' 
-                  ? 'bg-yellow-50 text-yellow-700' 
+              <div className={`text-sm p-2 rounded ${invitationStatus === 'pending'
+                  ? 'bg-yellow-50 text-yellow-700'
                   : 'bg-green-50 text-green-700'
-              }`}>
-                {invitationStatus === 'pending' 
-                  ? 'Creating invitation...' 
+                }`}>
+                {invitationStatus === 'pending'
+                  ? 'Creating invitation...'
                   : 'Invitation created successfully!'}
               </div>
             )}
@@ -379,8 +382,8 @@ const property = properties.find(p => p._id === value);
             className="px-4 py-2 bg-[#0369a1] hover:bg-[#075985] text-white rounded-md disabled:opacity-50"
             disabled={invitationStatus === 'pending'}
           >
-            {invitationStatus === 'pending' 
-              ? 'Creating Invitation...' 
+            {invitationStatus === 'pending'
+              ? 'Creating Invitation...'
               : 'Save & Invite Tenant'}
           </button>
         </div>

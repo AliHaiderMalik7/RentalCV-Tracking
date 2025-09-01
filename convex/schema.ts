@@ -98,10 +98,9 @@ const applicationTables = {
   })
     // .index("tenant_tenancies", ["tenantId"])
     .index("property_tenancies", ["propertyId"])
-    // --- NEW INDEXES FOR PERFORMANCE ---
-    .index("by_invite_token", ["inviteToken"]) // Critical for looking up invites by token
-    .index("by_status", ["status"]) // For filtering dashboards
-    .index("by_landlord", ["landlordId"]) // For landlord's dashboard
+    .index("by_invite_token", ["inviteToken"]) 
+    .index("by_status", ["status"]) 
+    .index("by_landlord", ["landlordId"]) 
     .index("by_tenant_email", ["invitedTenantEmail"]), 
 
   reviews: defineTable({

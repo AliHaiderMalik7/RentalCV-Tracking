@@ -1,7 +1,8 @@
-import { mutation, query } from "./_generated/server";
+import { action, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { Resend } from "resend";
 
 export const addTenancy = mutation({
     args: {
@@ -16,13 +17,12 @@ export const addTenancy = mutation({
         inviteToken: v.optional(v.string()),
         // inviteTokenExpiry: v.number(),
         landlordId: v.id("users"),
-
         status: v.string(),
         // sendEmail: v.boolean(),
     },
     handler: async (ctx, args) => {
         const { email, propertyId, inviteToken } = args;
-
+        const expires = Date.now() + 14 * 24 * 60 * 60 * 1000; // 24 hours
         // 1. Check for existing pending/active tenancy for same property + email
         const existingTenancy = await ctx.db
             .query("tenancies")
@@ -76,9 +76,11 @@ export const addTenancy = mutation({
             invitedTenantName: args.name,
             invitedTenantPhone: args.mobile,
             landlordId: args.landlordId,
-
+            inviteTokenExpiry: expires,
+            inviteToken: inviteToken
         });
 
+      
         // ✅ Return a response
         return {
             success: true,
@@ -158,3 +160,57 @@ export const getLandlordTenancies = query({
     return tenancies;
   },
 });
+
+
+export const sendInviteEmail = action({
+    args: { email: v.string(), token: v.string() },
+    handler: async (_ctx, { email, token }) => {
+      const resend = new Resend(process.env.RESEND_API_KEY!);
+
+      console.log("email to be send is", email);
+      
+  
+      const inviteLink = `http://localhost:5173/verify-invite?token=${token}`;
+  
+      await resend.emails.send({
+        from: process.env.AUTH_EMAIL ?? "My App <onboarding@resend.dev>",
+        to: email,
+        subject: "You’ve been invited!",
+        html: `<p>You’ve been invited. Click below to accept:</p>
+               <a href="${inviteLink}">Accept Invitation</a>`,
+      });
+  
+      return { success: true };
+    },
+  });
+  
+
+  export const acceptInvite = mutation({
+    args: { token: v.string(), userId: v.id("users") },
+    handler: async (ctx, args) => {
+      const tenancy = await ctx.db
+        .query("tenancies")
+        .withIndex("by_invite_token", (q) => q.eq("inviteToken", args.token))
+        .unique();
+  
+      if (!tenancy) throw new Error("Invalid invitation token");
+  
+      if (!tenancy.inviteTokenExpiry || tenancy.inviteTokenExpiry < Date.now()) {
+        return { success: false, error: "⏰ This invitation has expired." };
+      }
+  
+      if (tenancy.status !== "pending") {
+        return { success: false, error: "This invite is no longer valid." };
+      }
+  
+      await ctx.db.patch(tenancy._id, {
+        // tenantId: args.userId,
+        status: "active",
+        // inviteToken: null,
+        // inviteTokenExpiry: null,
+      });
+  
+      return { success: true, tenancyId: tenancy._id };
+    },
+  });
+  
