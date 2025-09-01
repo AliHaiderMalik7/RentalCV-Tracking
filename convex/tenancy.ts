@@ -9,21 +9,16 @@ export const addTenancy = mutation({
         propertyId: v.id("properties"),
         startDate: v.number(),
         endDate: v.optional(v.number()),
-        // monthlyRent: v.number(),
-        // depositAmount: v.number(),
         name: v.string(),
         email: v.string(),
         mobile: v.optional(v.string()),
         inviteToken: v.optional(v.string()),
-        // inviteTokenExpiry: v.number(),
         landlordId: v.id("users"),
         status: v.string(),
-        // sendEmail: v.boolean(),
     },
     handler: async (ctx, args) => {
         const { email, propertyId, inviteToken } = args;
         const expires = Date.now() + 14 * 24 * 60 * 60 * 1000; // 24 hours
-        // 1. Check for existing pending/active tenancy for same property + email
         const existingTenancy = await ctx.db
             .query("tenancies")
             .withIndex("by_tenant_email", (q) => q.eq("invitedTenantEmail", email))
@@ -42,28 +37,12 @@ export const addTenancy = mutation({
 
 
         if (existingTenancy) {
-            throw new Error(
-                "An active or pending invitation already exists for this tenant at this property"
-            );
-        }
-
-        // 2. Check if user already exists
-        // const userExists:any = await ctx.runQuery(internal.users.checkUserExists, {
-        //   email: args.email,
-        // });
-
-        // let tenantId = undefined;
-        // if (userExists.exists) {
-        //   // Find the user ID from the users table
-        //   const userRecord = await ctx.db
-        //     .query("users")
-        //     .withIndex("email", (q) => q.eq("email", args.email))
-        //     .first();
-
-        //   if (userRecord) {
-        //     tenantId = userRecord._id;
-        //   }
-        // }
+            return {
+              success: false,
+              error:
+                "An active or pending invitation already exists for this tenant at this property",
+            };
+          }
 
         // 3. Create the tenancy record
         const tenancyId = await ctx.db.insert("tenancies", {
@@ -81,66 +60,15 @@ export const addTenancy = mutation({
         });
 
       
-        // ✅ Return a response
         return {
             success: true,
             message: "Tenancy created successfully",
             tenancyId,
         };
 
-        // 4. Send invitation email if requested
-        // if (args.sendEmail) {
-        //   try {
-        //     // Get property details for the email
-        //     const property = await ctx.db.get(args.propertyId);
-        //     if (!property) {
-        //       throw new Error("Property not found");
-        //     }
-
-        //     // Get landlord details
-        //     const landlord = await ctx.db.get(args.landlordId);
-        //     if (!landlord) {
-        //       throw new Error("Landlord not found");
-        //     }
-
-        //     // Send the invitation email
-        //     await ctx.scheduler.runAfter(0, internal.emails.sendTenantInvitation, {
-        //       tenancyId,
-        //       tenantEmail: args.email,
-        //       tenantName: args.name,
-        //       propertyAddress: property.addressLine1,
-        //       landlordName: landlord.name,
-        //       inviteToken: args.inviteToken,
-        //       isExistingUser: userExists.exists,
-        //     });
-
-        //     // Optionally send SMS if mobile provided
-        //     if (args.mobile) {
-        //       await ctx.scheduler.runAfter(0, internal.sms.sendTenantInvitationSms, {
-        //         mobile: args.mobile,
-        //         tenantName: args.name,
-        //         landlordName: landlord.name,
-        //         inviteToken: args.inviteToken,
-        //       });
-        //     }
-        //   } catch (emailError) {
-        //     console.error("Failed to send invitation email:", emailError);
-        //     // Don't throw here - the tenancy was created successfully
-        //     // Just log the error for monitoring
-        //   }
-        // }
-
-        // return {
-        //   tenancyId,
-        //   tenantExists: userExists.exists,
-        //   tenantId,
-        //   message: userExists.exists
-        //     ? "Invitation sent to existing user"
-        //     : "Invitation sent to new user",
-        // };
+      
     },
 });
-
 
 
 export const getLandlordTenancies = query({
@@ -150,8 +78,6 @@ export const getLandlordTenancies = query({
     if (!userId) {
       throw new Error("User must be authenticated");
     }
-
-    // ✅ Fetch all tenancies where landlordId = current user
     const tenancies = await ctx.db
       .query("tenancies")
       .withIndex("by_landlord", (q) => q.eq("landlordId", userId))
@@ -170,7 +96,7 @@ export const sendInviteEmail = action({
       console.log("email to be send is", email);
       
   
-      const inviteLink = `http://localhost:5173/verify-invite?token=${token}`;
+      const inviteLink = `http://localhost:5173/verify-invite?token=${token}&email=${email}`;
   
       await resend.emails.send({
         from: process.env.AUTH_EMAIL ?? "My App <onboarding@resend.dev>",
@@ -204,10 +130,7 @@ export const sendInviteEmail = action({
       }
   
       await ctx.db.patch(tenancy._id, {
-        // tenantId: args.userId,
         status: "active",
-        // inviteToken: null,
-        // inviteTokenExpiry: null,
       });
   
       return { success: true, tenancyId: tenancy._id };

@@ -1,32 +1,10 @@
 // src/pages/Tenants.tsx
 import { useState } from 'react';
-import { useQuery, useMutation } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from '../../../convex/_generated/api';
 import { AddTenantForm } from '@/components/home/landlord/tenant/AddTenantForm';
 
-// interface TenantFormData {
-//     startDate: string;
-//     endDate: string;
-//     rentAmount: string;
-//     depositAmount: string;
-//     firstName: string;
-//     lastName: string;
-//     email: string;
-//     phone: string;
-//     address: string;
-//     city: string;
-// }
 
-// interface Tenant {
-//     _id: Id<"users">;
-//     _creationTime: number;
-//     firstName: string;
-//     lastName?: string;
-//     email: string;
-//     phone?: string;
-//     address?: string;
-//     city?: string;
-// }
 
 const Tenants = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -53,35 +31,7 @@ const Tenants = () => {
 
     const handleAddTenant = async (e: React.FormEvent) => {
         e.preventDefault();
-        // try {
-        //     await createTenant({
-        //         firstName: formData.firstName,
-        //         lastName: formData.lastName,
-        //         email: formData.email,
-        //         phone: formData.phone,
-        //         address: formData.address,
-        //         city: formData.city,
-        //         startDate: formData.startDate,
-        //         endDate: formData.endDate,
-        //         rentAmount: parseFloat(formData.rentAmount),
-        //         depositAmount: formData.depositAmount ? parseFloat(formData.depositAmount) : undefined
-        //     });
-        //     setShowAddForm(false);
-        //     setFormData({
-        //         startDate: '',
-        //         endDate: '',
-        //         rentAmount: '',
-        //         depositAmount: '',
-        //         firstName: '',
-        //         lastName: '',
-        //         email: '',
-        //         phone: '',
-        //         address: '',
-        //         city: ''
-        //     });
-        // } catch (error) {
-        //     console.error('Error creating tenant:', error);
-        // }
+       
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,17 +39,7 @@ const Tenants = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // const filteredTenants = tenants?.filter(tenant => {
-    //     const searchLower = searchTerm.toLowerCase();
-    //     return (
-    //         tenant.firstName.toLowerCase().includes(searchLower) ||
-    //         (tenant.lastName && tenant.lastName.toLowerCase().includes(searchLower)) ||
-    //         tenant.email.toLowerCase().includes(searchLower) ||
-    //         (tenant.phone && tenant.phone.includes(searchTerm)) ||
-    //         (tenant.address && tenant.address.toLowerCase().includes(searchLower)) ||
-    //         (tenant.city && tenant.city.toLowerCase().includes(searchLower))
-    //     );
-    // });
+  
 
     return (
         <div className="max-w-7xl mx-auto p-4">
@@ -147,9 +87,7 @@ const Tenants = () => {
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Address
                                     </th>
-                                    {/* <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        City
-                                    </th> */}
+                                  
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Member Since
                                     </th>

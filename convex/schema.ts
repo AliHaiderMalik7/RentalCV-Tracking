@@ -56,7 +56,6 @@ const applicationTables = {
 
 
   tenancies: defineTable({
-    // ... your existing fields ...
     propertyId: v.id("properties"),
     // tenantId: v.id("users"), // This must be optional for pending invites!
     startDate: v.number(),
@@ -67,36 +66,30 @@ const applicationTables = {
 
     // --- NEW FIELDS FOR ONBOARDING & STATUS ---
     status: v.union(
-      v.literal("pending"), // Invite sent, tenant hasn't accepted
-      v.literal("active"),  // Tenant accepted, tenancy is live
-      v.literal("ended"),   // Tenancy end date has passed
-      v.literal("declined") // Tenant flagged details as incorrect
+      v.literal("pending"), 
+      v.literal("active"), 
+      v.literal("ended"),   
+      v.literal("declined") 
     ),
-    // Optional for tenant-initiated flow where landlord hasn't confirmed
     landlordId: v.optional(v.id("users")),
 
-    // --- NEW FIELDS FOR INVITATION LOGIC ---
-    inviteToken: v.optional(v.string()), // The unique token for the invite link
-    inviteTokenExpiry: v.optional(v.number()), // Timestamp when the token expires (14 days)
-    invitedTenantEmail: v.optional(v.string()), // The email the invite was sent to
-    invitedTenantName: v.optional(v.string()), // The name provided by the landlord
-    
-    invitedTenantPhone: v.optional(v.string()), // The phone number provided
+    inviteToken: v.optional(v.string()),       
+    inviteTokenExpiry: v.optional(v.number()), 
+    invitedTenantEmail: v.optional(v.string()),
+    invitedTenantName: v.optional(v.string()), 
+    invitedTenantPhone: v.optional(v.string()), 
 
-    // --- NEW FIELDS FOR LEGAL COMPLIANCE ---
     tenantCountry: v.optional(v.union(v.string(), v.null())),
     landlordCountry: v.optional(v.union(v.string(), v.null())),
     disclaimerVersionTenant: v.optional(v.union(v.string(), v.null())),
     disclaimerVersionLandlord: v.optional(v.union(v.string(), v.null())),
 
-    // --- NEW FIELDS FOR REVIEW LOGIC ---
     landlordReviewId: v.optional(v.union(v.id("reviews"), v.null())),
     tenantReviewId: v.optional(v.union(v.id("reviews"), v.null())),
     freeReviewEligible: v.optional(v.union(v.boolean(), v.null())),
     landlordReviewable: v.optional(v.union(v.boolean(), v.null())),
 
   })
-    // .index("tenant_tenancies", ["tenantId"])
     .index("property_tenancies", ["propertyId"])
     .index("by_invite_token", ["inviteToken"]) 
     .index("by_status", ["status"]) 

@@ -120,7 +120,8 @@ export const AddTenantForm = ({
 
       // // Call the mutation
       const result = await addTenancyMutation(mutationData);
-
+      console.log("result is ", result);
+      
 
       if (result.success) {
        const emailResponse = await sendEmailVerification({ email: formData.email, token });
@@ -128,18 +129,12 @@ export const AddTenantForm = ({
        
         toast.success(result.message);
       }
-      // if (sendEmail) {
-      //   setInvitationStatus('sent');
-      //   // Auto-close after success or let user see success message
-      //   setTimeout(() => {
-      //     onSuccess(); // Refresh the parent component
-      //     onClose(); // Close the form
-      //   }, 2000);
-      // } else {
-      //   setInvitationStatus('sent');
-      //   // For manual invites, show success but don't auto-close
-      //   onSuccess(); // Refresh the parent component
-      // }
+
+      else{
+        setInvitationStatus('error');
+        toast.error(result.error)
+      }
+   
 
     } catch (error: any) {
       console.error('Error creating tenancy:', error);

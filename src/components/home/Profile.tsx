@@ -21,18 +21,18 @@ export const ProfileView = ({ user, onEditProfile }: ProfileViewProps) => {
     const isVerifiedLandlord =
         displayUser?.roles === "landlord" && displayUser?.verified === true;
 
-        const handleSave = async (updatedUser: any) => {
-        
-            try {
-              await updateProfile(updatedUser); // pass updated fields
-              toast.success("Profile updated successfully!");
-            } catch (error:any) {
-                toast.error("Failed to update profile:", error);
-            }
-          };
+    const handleSave = async (updatedUser: any) => {
+
+        try {
+            await updateProfile(updatedUser); // pass updated fields
+            toast.success("Profile updated successfully!");
+        } catch (error: any) {
+            toast.error("Failed to update profile:", error);
+        }
+    };
     return (
         <>
-        <ToastContainer/>
+            <ToastContainer />
             <UpdateProfileForm
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

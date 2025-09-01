@@ -2,13 +2,13 @@ import { Route, Routes, useNavigate, Navigate } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import RoleSelection from "../pages/role/RoleSelection";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Authenticated, Unauthenticated, useConvexAuth } from "convex/react";
 import Home from "@/pages/profile/Home";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ResetPassword from "@/pages/auth/ResetPassword";
-import { ProfileView } from "@/components/home/Profile";
-import EmailVerification from "@/pages/auth/EmailVerification"; // ✅ import it
+import EmailVerification from "@/pages/auth/EmailVerification";
+import TenantInviteVerification from "@/components/home/landlord/tenant/TenantInviteVerification";
 
 export function AppRoutes() {
   const navigate = useNavigate();
@@ -35,7 +35,6 @@ export function AppRoutes() {
 
   return (
     <Routes>
-      {/* Public routes */}
       <Route
         path="/login"
         element={
@@ -93,18 +92,19 @@ export function AppRoutes() {
         }
       />
 
-      {/* ✅ Email Verification Route */}
       <Route
         path="/verify-email"
         element={
-        //   <Unauthenticated>
-                          <EmailVerification email={verifyEmail} />
+          //   <Unauthenticated>
+          <EmailVerification email={verifyEmail} />
 
-          
+
         }
       />
 
-      {/* Protected route */}
+      <Route path="/verify-invite" element={<TenantInviteVerification />} />
+
+
       <Route
         path="/home"
         element={
@@ -114,13 +114,11 @@ export function AppRoutes() {
         }
       />
 
-      {/* Root redirect */}
       <Route
         path="/"
         element={<Navigate to={isAuthenticated ? "/home" : "/login"} replace />}
       />
 
-      {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
