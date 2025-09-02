@@ -143,8 +143,7 @@ const applicationTables = {
       .index("by_status", ["status"])
       .index("by_invite_token", ["inviteToken"])
       .index("by_tenant_email", ["invitedTenantEmail"])
-      .index("by_landlord", ["landlordId"]);
-    
+      .index("by_landlord", ["landlordId"]),
 
   reviews: defineTable({
     tenancyId: v.id("tenancies"),

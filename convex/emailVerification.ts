@@ -82,7 +82,8 @@ export const sendVerificationEmail = action({
   handler: async (ctx, args) => {
     const verificationLink = `http://localhost:5173/verify-email?token=${args.token}`;
 
-
+    console.log("verification link is", verificationLink);
+    
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error } = await resend.emails.send({
       from: process.env.AUTH_EMAIL ?? "My App <onboarding@resend.dev>",
