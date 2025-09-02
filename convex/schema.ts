@@ -63,6 +63,7 @@ const applicationTables = {
     monthlyRent: v.optional(v.number()),
     depositAmount: v.optional(v.number()),
     createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
 
     // --- NEW FIELDS FOR ONBOARDING & STATUS ---
     status: v.union(
@@ -81,6 +82,8 @@ const applicationTables = {
     invitedTenantPhone: v.optional(v.string()), 
 
     tenantCountry: v.optional(v.union(v.string(), v.null())),
+    tenantRegion: v.optional(v.union(v.string(), v.null())),
+
     landlordCountry: v.optional(v.union(v.string(), v.null())),
     disclaimerVersionTenant: v.optional(v.union(v.string(), v.null())),
     disclaimerVersionLandlord: v.optional(v.union(v.string(), v.null())),

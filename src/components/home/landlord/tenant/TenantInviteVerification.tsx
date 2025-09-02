@@ -5,7 +5,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 
 function TenantInviteVerification() {
@@ -31,6 +31,8 @@ function TenantInviteVerification() {
     const disclaimerRef = useRef<HTMLDivElement | null>(null);
     const [timestamp, setTimestamp] = useState<number>(Date.now());
     const [device, setDevice] = useState<string>("");
+    const updateTenancyStatus = useMutation(api.tenancy.updateTenancyStatus);
+
 
     const tenancyDetails:any = useQuery(
         api.tenancy.getTenancyDetailsByEmail,
@@ -132,7 +134,6 @@ function TenantInviteVerification() {
             });
     }, []);
 
-    // Fetch regions when country changes
     useEffect(() => {
         if (!country) return;
 
@@ -144,7 +145,6 @@ function TenantInviteVerification() {
             .then((res) => res.json())
             .then((data) => {
                 const regionList = data.data.states.map((s: any) => s.name);
-                console.log("regions list", regionList);
                 
                 setRegions(regionList);
 
