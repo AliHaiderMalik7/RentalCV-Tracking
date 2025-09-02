@@ -33,7 +33,6 @@ export const addTenancy = mutation({
             )
             .first();
 
-        console.log("tenancy exists", existingTenancy);
 
 
         if (existingTenancy) {
@@ -50,7 +49,7 @@ export const addTenancy = mutation({
             startDate: args.startDate,
             endDate: args.endDate,
             createdAt: Date.now(),
-            status: "pending",
+            status: "invited",
             invitedTenantEmail: args.email,
             invitedTenantName: args.name,
             invitedTenantPhone: args.mobile,
@@ -137,3 +136,25 @@ export const sendInviteEmail = action({
     },
   });
   
+
+  export const getTenancyDetailsByEmail = query({
+    args: { email: v.string() }, // expect tenant's email
+    handler: async (ctx, { email }) => {
+      const userId = await getAuthUserId(ctx);
+      if (!userId) {
+        throw new Error("User must be authenticated");
+      }
+  
+      const tenancy = await ctx.db
+        .query("tenancies")
+        .withIndex("by_tenant_email", (q) => q.eq("invitedTenantEmail", email))
+        .first(); // get one tenancy for this email
+  
+      if (!tenancy) {
+        throw new Error("No tenancy found for this email");
+      }
+  
+      return tenancy;
+    },
+  });
+   

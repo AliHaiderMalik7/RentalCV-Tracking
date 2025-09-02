@@ -5,6 +5,8 @@ import { FaArrowLeft } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
+import { useQuery } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
 
 function TenantInviteVerification() {
     const location = useLocation();
@@ -27,24 +29,75 @@ function TenantInviteVerification() {
     const [detected, setDetected] = useState(false);
     const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
     const disclaimerRef = useRef<HTMLDivElement | null>(null);
+    const [timestamp, setTimestamp] = useState<number>(Date.now());
+    const [device, setDevice] = useState<string>("");
 
-    // Mock: verify invite token
+    const tenancyDetails:any = useQuery(
+        api.tenancy.getTenancyDetailsByEmail,
+        email ? { email } : "skip"
+      );
+
+      const propertyData = useQuery(
+        api.properties.getPropertyById,
+        tenancyDetails?.propertyId ? { propertyId: tenancyDetails.propertyId } : "skip"
+      );
+
+      const landlordData = useQuery(
+        api.users.getUserById,
+        tenancyDetails?.landlordId ? { userId: tenancyDetails?.landlordId } : "skip"
+      );
+
+    
     useEffect(() => {
-        setTimeout(() => {
-            if (!token) {
-                setInviteData(null);
-            } else {
-                setInviteData({
-                    tenantEmail: email,
-                    landlordName: "John Landlord",
-                    property: "Apartment 5B, Main Street",
-                    startDate: "2025-09-01",
-                    endDate: "2026-09-01",
-                });
-            }
-            setLoading(false);
-        }, 1000);
-    }, [token, email]);
+        setDevice(navigator.userAgent);
+    }, []);
+
+    const [hasValidated, setHasValidated] = useState(false);
+
+    useEffect(() => {
+        console.log("tenancyDetails", tenancyDetails);
+        if (!tenancyDetails || hasValidated) return;
+      
+        if (!tenancyDetails.inviteToken || tenancyDetails.inviteToken !== token) {
+          setInviteData(null);
+          setLoading(false);
+          toast.error("❌ Invalid invitation link.");
+          setHasValidated(true);
+          return;
+        }
+      
+        const tokenExpiry = Number(tenancyDetails.inviteTokenExpiry);
+        console.log("Now:", Date.now(), "Token Expiry:", tokenExpiry, "Expired:", Date.now() > tokenExpiry);
+      
+        if (!tokenExpiry || Date.now() > tokenExpiry) {
+          setInviteData(null);
+          setLoading(false);
+          toast.error("❌ Invitation link has expired.");
+          setHasValidated(true);
+          return;
+        }
+      
+        if (!propertyData || !landlordData) return;
+      
+        setInviteData({
+          tenantEmail: email,
+          landlordName: landlordData.name ?? "Unknown Landlord",
+          property: propertyData.address ?? "Unknown Address",
+          startDate: tenancyDetails.startDate
+            ? new Date(tenancyDetails.startDate).toISOString()
+            : null,
+          endDate: tenancyDetails.endDate
+            ? new Date(tenancyDetails.endDate).toISOString()
+            : null,
+        });
+      
+        setLoading(false);
+        setHasValidated(true);
+      }, [tenancyDetails, propertyData, landlordData, token, email, hasValidated]);
+      
+      
+      
+      
 
     // Fetch countries
     useEffect(() => {
@@ -70,7 +123,7 @@ function TenantInviteVerification() {
                 if (data.country) {
                     setCountry(data.country);
                     setIp(data.ip);
-                    setRegion(data.region || ""); // detect region
+                    setRegion(data.region || "");
                     setDetected(true);
                 }
             })
@@ -79,6 +132,7 @@ function TenantInviteVerification() {
             });
     }, []);
 
+    // Fetch regions when country changes
     useEffect(() => {
         if (!country) return;
 
@@ -90,12 +144,14 @@ function TenantInviteVerification() {
             .then((res) => res.json())
             .then((data) => {
                 const regionList = data.data.states.map((s: any) => s.name);
+                console.log("regions list", regionList);
+                
                 setRegions(regionList);
 
                 if (region && regionList.includes(region)) {
                     setRegion(region);
                 } else {
-                    setRegion(""); 
+                    setRegion("");
                 }
             })
             .catch((err) => {
@@ -120,8 +176,8 @@ function TenantInviteVerification() {
                 country,
                 region,
                 ip,
-                device: navigator.userAgent,
-                timestamp: Date.now(),
+                device,
+                timestamp,
             };
 
             console.log("✅ Accept payload:", payload);
@@ -140,12 +196,14 @@ function TenantInviteVerification() {
             <ToastContainer />
             <div className="w-full flex items-center justify-center p-6">
                 <div className="w-full max-w-xl bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+                    {/* Header */}
                     <div className="bg-gradient-to-r from-[#0369a1] to-[#0284c7] p-8 text-center">
                         <h2 className="text-3xl font-light text-white mb-1 tracking-wide">
                             Tenant Invitation Verification
                         </h2>
                     </div>
 
+                    {/* Content */}
                     <div className="p-8 space-y-6 text-center">
                         {loading && (
                             <p className="text-slate-600">⏳ Checking your invitation...</p>
@@ -169,22 +227,25 @@ function TenantInviteVerification() {
 
                         {!loading && inviteData && (
                             <div className="space-y-4 text-left">
-                                <p className="text-slate-700">
-                                    📧 <span className="font-semibold">Tenant Email:</span>{" "}
-                                    {inviteData.tenantEmail}
-                                </p>
-                                <p className="text-slate-700">
-                                    🏠 <span className="font-semibold">Property:</span>{" "}
-                                    {inviteData.property}
-                                </p>
-                                <p className="text-slate-700">
-                                    👤 <span className="font-semibold">Landlord:</span>{" "}
-                                    {inviteData.landlordName}
-                                </p>
-                                <p className="text-slate-700">
-                                    📅 <span className="font-semibold">Tenancy Period:</span>{" "}
-                                    {inviteData.startDate} → {inviteData.endDate}
-                                </p>
+                                {/* Summary instead of raw details */}
+                                <div className="bg-slate-50 border rounded-lg p-4 text-slate-700 text-sm leading-relaxed">
+                                    <p>
+                                        You have been invited by{" "}
+                                        <span className="font-semibold">{inviteData.landlordName}</span>{" "}
+                                        to enter into a tenancy agreement for{" "}
+                                        <span className="font-semibold">{inviteData.property}</span>.
+                                    </p>
+                                    <p className="mt-2">
+                                        The tenancy period will run from{" "}
+                                        <span className="font-medium">
+                                            {new Date(inviteData.startDate).toLocaleDateString()}
+                                        </span>{" "}
+                                        to{" "}
+                                        <span className="font-medium">
+                                            {new Date(inviteData.endDate).toLocaleDateString()}
+                                        </span>.
+                                    </p>
+                                </div>
 
                                 {/* Country Dropdown */}
                                 <label className="block text-sm font-medium text-slate-700 mt-4">
@@ -242,6 +303,17 @@ function TenantInviteVerification() {
                                     </p>
                                 </div>
 
+                                {/* Logs Section */}
+                                {/* <div className="mt-6 p-4 bg-slate-100 border rounded-lg text-sm text-slate-700">
+                                    <p className="font-semibold mb-2">📜 Verification Logs</p>
+                                    <p>🌍 <span className="font-medium">Country:</span> {country || "N/A"}</p>
+                                    <p>🗺️ <span className="font-medium">Region:</span> {region || "N/A"}</p>
+                                    <p>⏱️ <span className="font-medium">Timestamp:</span> {new Date(timestamp).toLocaleString()}</p>
+                                    <p>💻 <span className="font-medium">Device:</span> {device || "N/A"}</p>
+                                    <p>🔗 <span className="font-medium">IP:</span> {ip || "N/A"}</p>
+                                </div> */}
+
+                                {/* Buttons */}
                                 <div className="flex flex-col gap-4 mt-6">
                                     <Button
                                         disabled={!country || !region || !hasScrolledToBottom}

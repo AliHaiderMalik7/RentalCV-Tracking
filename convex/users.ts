@@ -21,45 +21,20 @@ export const getTenants = query({
   },
 });
 
-// export const getTenantById = query({
-//   args: { tenantId: v.id("users") },
-//   handler: async (ctx, args) => {
-//     const userId = await getAuthUserId(ctx);
-//     if (!userId) {
-//       throw new Error("User must be authenticated");
-//     }
 
-//     // Verify requesting user is landlord or admin
-//     const currentUser = await ctx.db
-//       .query("users")
-//       .withIndex("by_userId", (q) => q.eq("userId", userId))
-//       .unique();
 
-//     if (!currentUser) {
-//       throw new Error("User not found");
-//     }
 
-//     if (currentUser.role !== "landlord" && currentUser.role !== "admin") {
-//       throw new Error("Unauthorized - only landlords and admins can view tenant details");
-//     }
+export const getUserById = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    const user = await ctx.db.get(userId);
+    if (!user) return null;
 
-//     // Get the tenant
-//     const tenant = await ctx.db.get(args.tenantId);
-//     if (!tenant) {
-//       throw new Error("Tenant not found");
-//     }
-
-//     if (tenant.role !== "tenant") {
-//       throw new Error("User is not a tenant");
-//     }
-
-//     return {
-//       id: tenant._id,
-//       userId: tenant.userId,
-//       name: tenant.name,
-//       email: tenant.email,
-//       phone: tenant.phone,
-//       createdAt: tenant.createdAt,
-//     };
-//   },
-// });
+    // Return only safe fields
+    return {
+      _id: user._id,
+      name: `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim(),
+      email: user.email,
+    };
+  },
+});

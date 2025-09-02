@@ -109,7 +109,7 @@ export const AddTenantForm = ({
         name: formData.name,
         email: formData.email,
         mobile: formData.mobile,
-        status: "pending",
+        status: "invited",
         inviteToken:token,
         // inviteTokenExpiry,
         landlordId: currentUser?._id,

@@ -66,6 +66,7 @@ const applicationTables = {
 
     // --- NEW FIELDS FOR ONBOARDING & STATUS ---
     status: v.union(
+      v.literal("invited"), 
       v.literal("pending"), 
       v.literal("active"), 
       v.literal("ended"),   

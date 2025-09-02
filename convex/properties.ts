@@ -284,3 +284,21 @@ export const deleteProperty = mutation({
         return args.propertyId;
     },
 });
+
+
+
+export const getPropertyById = query({
+    args: { propertyId: v.id("properties") },
+    handler: async (ctx, { propertyId }) => {
+      const property = await ctx.db.get(propertyId);
+      if (!property) return null;
+  
+      // Return only essential fields
+      return {
+        _id: property._id,
+        address: property.addressLine1,
+        landlordId: property.landlordId, // keep if you need landlord info
+      };
+    },
+  });
+  

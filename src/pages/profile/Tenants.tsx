@@ -31,7 +31,7 @@ const Tenants = () => {
 
     const handleAddTenant = async (e: React.FormEvent) => {
         e.preventDefault();
-       
+
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +39,7 @@ const Tenants = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-  
+
 
     return (
         <div className="max-w-7xl mx-auto p-4">
@@ -87,7 +87,7 @@ const Tenants = () => {
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Address
                                     </th>
-                                  
+
                                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Member Since
                                     </th>
@@ -111,7 +111,7 @@ const Tenants = () => {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {tenant.invitedTenantAddress || 'N/A'}
                                             </td>
-                                         
+
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {new Date(tenant._creationTime).toLocaleDateString('en-US', {
                                                     year: 'numeric',
@@ -126,12 +126,15 @@ const Tenants = () => {
                                                             ? "bg-red-100 text-red-800"
                                                             : tenant.status === "active"
                                                                 ? "bg-green-100 text-green-800"
-                                                                : "bg-gray-100 text-gray-800"
+                                                                : tenant.status === "invited"
+                                                                    ? "bg-yellow-100 text-yellow-800"
+                                                                    : "bg-gray-100 text-gray-800"
                                                         }`}
                                                 >
                                                     {tenant.status || "N/A"}
                                                 </span>
                                             </td>
+
 
                                         </tr>
                                     ))
