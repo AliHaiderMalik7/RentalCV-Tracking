@@ -21,20 +21,14 @@ interface Property {
 
 interface AddTenantFormProps {
   onClose: () => void;
-  onSuccess: () => void; // Changed from onSubmit to onSuccess
   properties: any;
-  currentLandlord: {
-    id: string;
-    name: string;
-    isVerified: boolean;
-  };
+ 
 }
 
 export const AddTenantForm = ({
   onClose,
-  onSuccess,
   properties,
-  currentLandlord
+  
 }: AddTenantFormProps) => {
   const currentUser = useQuery(api.auth.getCurrentUser);
 
@@ -145,10 +139,10 @@ export const AddTenantForm = ({
     }
   };
 
-  const getPropertyDisplay = (propertyId: string) => {
-    const property = properties.find(p => p.id === propertyId);
-    return property ? property.addressLine1 : 'Select a property';
-  };
+  // const getPropertyDisplay = (propertyId: string) => {
+  //   const property = properties.find(p => p.id === propertyId);
+  //   return property ? property.addressLine1 : 'Select a property';
+  // };
 
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 mb-6 p-6">

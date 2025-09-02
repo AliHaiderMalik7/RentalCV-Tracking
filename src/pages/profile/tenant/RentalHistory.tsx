@@ -44,13 +44,13 @@ const RentalHistoryPage = () => {
     setIsAdding(false);
   };
 
-  const toggleExpand = (id) => {
+  const toggleExpand = (id: number) => {
     setRentalHistory(rentalHistory.map(entry => 
       entry.id === id ? {...entry, expanded: !entry.expanded} : entry
     ));
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: number) => {
     setRentalHistory(rentalHistory.filter(entry => entry.id !== id));
   };
 

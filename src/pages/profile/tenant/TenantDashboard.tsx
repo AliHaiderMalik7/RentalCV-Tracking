@@ -1,17 +1,13 @@
-import { QuickActions } from "@/components/home/landlord/dashboard/QuickActions";
 import { RentTimelineChart } from "@/components/home/landlord/dashboard/RentTimeLineChart";
 import { LeaseStatusCard } from "@/components/home/landlord/tenant/LeaseStatusCard";
 import { MaintenanceRequests } from "@/components/home/landlord/tenant/MaintenanceRequests";
 import { PaymentHistoryChart } from "@/components/home/landlord/tenant/PaymentHistoryChart";
-import { QuickActionsTenant } from "@/components/home/landlord/tenant/QuickActionsTenant";
 import { RecentCommunications } from "@/components/home/landlord/tenant/RecentCommunications";
 import {
     FaHome,
     FaPoundSign,
-    FaClock,
     FaFileAlt,
     FaShieldAlt,
-    FaChartLine
   } from "react-icons/fa";
 
   export default function TenantDashboard() {

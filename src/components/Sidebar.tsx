@@ -1,4 +1,3 @@
-// src/components/Sidebar.tsx
 import { 
     FaHome, 
     FaUser, 
@@ -11,8 +10,7 @@ import {
   } from "react-icons/fa";
   import { useAuthActions } from "@convex-dev/auth/react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+
   
   interface SidebarProps {
     role?: 'landlord' | 'tenant';
@@ -21,7 +19,6 @@ import { api } from "../../convex/_generated/api";
   }
   
   const Sidebar = ({ role, activeTab, onTabChange }: SidebarProps) => {
-    const user:any = useQuery(api.auth.getCurrentUser);
     const { signOut } = useAuthActions();
     const navigate = useNavigate();
 

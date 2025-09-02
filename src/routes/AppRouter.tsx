@@ -14,10 +14,11 @@ export function AppRoutes() {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState<any>(null);
   const [resetEmail, setResetEmail] = useState<string>();
-  const [verifyEmail, setVerifyEmail] = useState<string>(); // ✅ new state
   const { isLoading, isAuthenticated } = useConvexAuth();
   const [step, setStep] = useState<"forgot" | { email: string }>("forgot");
+console.log("resetEmail", resetEmail);
 
+  console.log("isAuthenticated", isAuthenticated);
   const handleRoleSelect = (role: "tenant" | "landlord") => {
     setSelectedRole(role);
     navigate("/signup");
@@ -96,7 +97,7 @@ export function AppRoutes() {
         path="/verify-email"
         element={
           //   <Unauthenticated>
-          <EmailVerification email={verifyEmail} />
+          <EmailVerification  />
 
 
         }

@@ -107,7 +107,7 @@ const SettingsPage = () => {
 
 
       // Update user with the new documents
-      const updateUserResponse = await updateUser({
+      await updateUser({
         email: user.email,
         idVerificationDocs: idDocs,
         proofOfAddress: proofDocs,

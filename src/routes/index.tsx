@@ -3,7 +3,7 @@ import { Navigate, Outlet } from "react-router-dom";
 // import { Loader2 } from "lucide-react";
 
 export function ProtectedRoute() {
-  const { isLoading, isAuthenticated } = useConvexAuth();
+  const { isLoading } = useConvexAuth();
 
   if (isLoading) {
     return (
@@ -21,7 +21,7 @@ export function ProtectedRoute() {
 }
 
 export function AuthRoute() {
-  const { isLoading, isAuthenticated } = useConvexAuth();
+  const { isLoading } = useConvexAuth();
 
   if (isLoading) {
     return (

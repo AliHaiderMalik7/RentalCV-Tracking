@@ -9,18 +9,18 @@ import { AddTenantForm } from '@/components/home/landlord/tenant/AddTenantForm';
 const Tenants = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
-    const [formData, setFormData] = useState<TenantFormData>({
-        startDate: '',
-        endDate: '',
-        rentAmount: '',
-        depositAmount: '',
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        address: '',
-        city: ''
-    });
+    // const [formData, setFormData] = useState<TenantFormData>({
+    //     startDate: '',
+    //     endDate: '',
+    //     rentAmount: '',
+    //     depositAmount: '',
+    //     firstName: '',
+    //     lastName: '',
+    //     email: '',
+    //     phone: '',
+    //     address: '',
+    //     city: ''
+    // });
 
     const tenants = useQuery(api.tenancy.getLandlordTenancies);
     const properties = useQuery(api.properties.getByLandlord);
@@ -29,15 +29,15 @@ const Tenants = () => {
 
 
 
-    const handleAddTenant = async (e: React.FormEvent) => {
-        e.preventDefault();
+    // const handleAddTenant = async (e: React.FormEvent) => {
+    //     e.preventDefault();
 
-    };
+    // };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const { name, value } = e.target;
+    //     setFormData(prev => ({ ...prev, [name]: value }));
+    // };
 
 
 
@@ -66,7 +66,7 @@ const Tenants = () => {
                 </div>
 
                 {showAddForm && (
-                    <AddTenantForm onClose={() => setShowAddForm(false)} onSubmit={handleAddTenant} properties={properties} />
+                    <AddTenantForm onClose={() => setShowAddForm(false)}  properties={properties} />
                 )}
 
                 {/* Tenants Table */}
@@ -109,7 +109,7 @@ const Tenants = () => {
                                                 {tenant.invitedTenantPhone || 'N/A'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {tenant.invitedTenantAddress || 'N/A'}
+                                                {/* {tenant.invitedTenantAddress || 'N/A'} */} N/A
                                             </td>
 
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

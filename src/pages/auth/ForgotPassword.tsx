@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import loginImage from "../../../public/banner.avif";
 import Button from "@/components/common/Button";
 import InputField from "@/components/common/InputField";
 import { useNavigate } from "react-router-dom";
 
 import { useAuthActions } from "@convex-dev/auth/react";
-import { FaShieldAlt, FaLock, FaArrowLeft, FaEye, FaEyeSlash, FaEnvelope } from 'react-icons/fa';
-import { toast } from "react-toastify";
+import {  FaArrowLeft,  FaEnvelope } from 'react-icons/fa';
 import AuthBanner from "@/components/common/AuthBanner";
 
 interface ForgotPasswordProps {
     onEmailSubmitted: (email: boolean) => void;
-    step: "forgot" | { email: string };
+    // step: "forgot" | { email: string };
     setStep: React.Dispatch<React.SetStateAction<"forgot" | { email: string }>>;
 }
 
 
-function ForgotPassword({ onEmailSubmitted, step, setStep, }: ForgotPasswordProps) {
+function ForgotPassword({ onEmailSubmitted, setStep, }: ForgotPasswordProps) {
     const [email, setEmail] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [error, setError] = useState("");
@@ -25,7 +24,8 @@ function ForgotPassword({ onEmailSubmitted, step, setStep, }: ForgotPasswordProp
     //   const sendResetEmail = useMutation(api.auth.sendPasswordReset);
 
     const { signIn } = useAuthActions();
-
+    console.log("isSubmitted", isSubmitted);
+    
 
 
     const handleSubmit = async (event: any) => {
@@ -45,7 +45,7 @@ function ForgotPassword({ onEmailSubmitted, step, setStep, }: ForgotPasswordProp
             onEmailSubmitted(false);
 
             setIsSubmitted(false)
-            //   setError(err instanceof Error ? err.message : "Failed to send reset email");
+              setError(err instanceof Error ? err.message : "Failed to send reset email");
             //   toast.error(error);
         }
     };

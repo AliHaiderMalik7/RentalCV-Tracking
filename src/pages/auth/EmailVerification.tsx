@@ -9,9 +9,6 @@ import AuthBanner from "@/components/common/AuthBanner";
 import { useAction, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 
-interface EmailVerificationProps {
-    email: string;
-}
 
 function EmailVerification() {
     const { signOut } = useAuthActions();
