@@ -100,6 +100,52 @@ const applicationTables = {
     .index("by_landlord", ["landlordId"]) 
     .index("by_tenant_email", ["invitedTenantEmail"]), 
 
+    tenancyInvitations: defineTable({
+      propertyId: v.id("properties"),
+    
+      startDate: v.number(),
+      endDate: v.optional(v.number()),
+    
+      createdAt: v.number(),
+      updatedAt: v.optional(v.number()),
+    
+      createdBy: v.optional(v.id("users")),
+      updatedBy: v.optional(v.id("users")),
+    
+      status: v.union(
+        v.literal("invited"),
+        v.literal("pending"),
+        v.literal("active"),
+        v.literal("ended"),
+        v.literal("declined")
+      ),
+    
+      landlordId: v.optional(v.id("users")),
+    
+      inviteToken: v.optional(v.string()),
+      inviteTokenExpiry: v.optional(v.number()),
+    
+      invitedTenantEmail: v.optional(v.string()),
+      invitedTenantName: v.optional(v.string()),
+      invitedTenantPhone: v.optional(v.string()),
+    
+      tenantCountry: v.optional(v.union(v.string(), v.null())),
+      tenantRegion: v.optional(v.union(v.string(), v.null())),
+    
+      // New fields for tracking tenant acceptance context
+      country: v.optional(v.union(v.string(), v.null())),
+      disclaimerVersion: v.optional(v.union(v.string(), v.null())),
+      timestamp: v.optional(v.number()),
+      ip: v.optional(v.string()),
+      device: v.optional(v.string()),
+    })
+      .index("by_property", ["propertyId"])
+      .index("by_status", ["status"])
+      .index("by_invite_token", ["inviteToken"])
+      .index("by_tenant_email", ["invitedTenantEmail"])
+      .index("by_landlord", ["landlordId"]);
+    
+
   reviews: defineTable({
     tenancyId: v.id("tenancies"),
     reviewerId: v.id("users"),
