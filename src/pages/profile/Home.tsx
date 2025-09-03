@@ -4,13 +4,10 @@ import Sidebar from "@/components/Sidebar";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { ProfileView } from "@/components/home/Profile";
-import LandlordDashboard from './Dashboard';
 import Properties from '@/pages/profile/Properties';
 import Tenants from './Tenants';
 import RentalHistoryPage from './tenant/RentalHistory';
-import TenantDashboard from './tenant/TenantDashboard';
 import SettingsPage from './tenant/Settings';
-import TenantReviewsPage from './tenant/TenantReview';
 
 const ProfilePage = () => {
     const user = useQuery(api.auth.getCurrentUser);
@@ -18,9 +15,9 @@ const ProfilePage = () => {
 
 
 
-    const handleEditProfile = async () => {
-        // Edit profile logic here
-    }
+    // const handleEditProfile = async () => {
+    //     // Edit profile logic here
+    // }
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
@@ -29,7 +26,7 @@ const ProfilePage = () => {
     return (
         <div className="flex min-h-screen bg-slate-100">
             <Sidebar
-                role={user?.roles}
+                role={user?.roles as "landlord" | "tenant"}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
             />
@@ -37,10 +34,10 @@ const ProfilePage = () => {
             {/* Main Content */}
             <div className="flex-1 ml-64 p-8">
                 <div className="max-w-7xl mx-auto">
-                    {activeTab === "profile" && <ProfileView user={user} onEditProfile={handleEditProfile} />
+                    {activeTab === "profile" && <ProfileView user={user} />
                     }
                     {activeTab === "properties" && <Properties/>}
-                    {activeTab === "dashboard" && <LandlordDashboard/>}
+                    {/* {activeTab === "dashboard" && <LandlordDashboard/>} */}
 
                     {/* {activeTab === "dashboard" && <TenantDashboard/>} */}
                     {activeTab === "tenants" && <Tenants/>}

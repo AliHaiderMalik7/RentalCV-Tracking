@@ -10,6 +10,8 @@ export const ResendOTPPasswordReset = Resend({
     return generateRandomString(8, alphabet("0-9"));
   },
   async sendVerificationRequest({ identifier: email, provider, token }) {
+    console.log("email in verification request", email);
+    
     const resend = new ResendAPI(provider.apiKey);
     const { error } = await resend.emails.send({
         from: "onboarding@resend.dev",

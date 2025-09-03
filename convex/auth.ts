@@ -1,12 +1,12 @@
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
 import { Password } from "@convex-dev/auth/providers/Password";
-import { Email } from "@convex-dev/auth/providers/Email";
+// import { Email } from "@convex-dev/auth/providers/Email";
 import { Anonymous } from "@convex-dev/auth/providers/Anonymous";
 
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { ResendOTPPasswordReset } from "./ResetOTPPasswordReset";
-import { verify } from "crypto";
+// import { ResendOTPPasswordReset } from "./ResetOTPPasswordReset";
+// import { verify } from "crypto";
 
 // export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 //   providers: [Password({  reset: ResendOTPPasswordReset})],
@@ -47,7 +47,7 @@ export const checkUserExists = mutation({
     // Check both auth system and your custom users table
 
     // 1. Check Convex auth system (for registered users)
-    const tokenIdentifier = `password|${email}`;
+    // const tokenIdentifier = `password|${email}`;
 
     // 2. Check your custom users table
     const userRecord = await ctx.db

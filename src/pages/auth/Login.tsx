@@ -23,7 +23,8 @@ const Login = () => {
   const { signIn } = useAuthActions();
 
   const checkEmailVerifiedByEmail = useMutation(api.auth.checkEmailVerifiedByEmail);
-
+  console.log("error", error,setStep);
+  
 
 
 

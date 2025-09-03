@@ -1,5 +1,5 @@
 // components/RecentTenants.tsx
-import { FaHome, FaClock, FaCheckCircle } from 'react-icons/fa';
+import {  FaClock, FaCheckCircle } from 'react-icons/fa';
 
 interface Tenant {
   id: string;

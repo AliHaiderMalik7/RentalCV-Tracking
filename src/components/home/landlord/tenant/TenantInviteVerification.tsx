@@ -5,7 +5,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
-import { useMutation, useQuery } from "convex/react";
+import {  useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 
 function TenantInviteVerification() {
@@ -29,9 +29,9 @@ function TenantInviteVerification() {
     const [detected, setDetected] = useState(false);
     const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
     const disclaimerRef = useRef<HTMLDivElement | null>(null);
-    const [timestamp, setTimestamp] = useState<number>(Date.now());
+    const timestamp = useRef<number>(Date.now());
+    // const [timestamp, setTimestamp] = useState<number>(Date.now());
     const [device, setDevice] = useState<string>("");
-    const updateTenancyStatus = useMutation(api.tenancy.updateTenancyStatus);
 
 
     const tenancyDetails:any = useQuery(

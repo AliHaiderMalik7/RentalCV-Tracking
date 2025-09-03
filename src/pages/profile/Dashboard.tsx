@@ -1,12 +1,12 @@
 import { RentTimelineChart } from "@/components/home/landlord/dashboard/RentTimeLineChart";
-import { alerts, properties, tenants } from "../../../utils/data";
+import {  properties, tenants } from "../../../utils/data";
 import {
     FaBuilding,
     FaPoundSign,
     FaClock,
     FaExclamationTriangle
 } from "react-icons/fa";
-import { PropertyStatusChart } from "@/components/home/landlord/dashboard/PropertyStatusChart";
+// import { PropertyStatusChart } from "@/components/home/landlord/dashboard/PropertyStatusChart";
 import { QuickActions } from "@/components/home/landlord/dashboard/QuickActions";
 import { RecentActivityLog } from "@/components/home/landlord/dashboard/RecentActivityLog";
 import { RecentTenants } from "@/components/home/landlord/dashboard/RecentTenants";
@@ -62,7 +62,7 @@ export default function LandlordDashboard() {
                     <RentTimelineChart />
                 </div>
                 <div className="bg-white rounded-xl shadow-sm p-5 min-h-[20rem]">
-                    <PropertyStatusChart properties={properties} />
+                    {/* <PropertyStatusChart properties={properties} /> */}
                 </div>
             </div>
 

@@ -1,4 +1,4 @@
-import { mutation, query, action } from "./_generated/server";
+import { mutation, action } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Resend } from "resend";
@@ -79,6 +79,7 @@ export const verifyEmail = mutation({
 // Send verification email (action to use external email service)
 export const sendVerificationEmail = action({
   args: { email: v.string(), token: v.string() },
+  // @ts-ignore
   handler: async (ctx, args) => {
     const verificationLink = `http://localhost:5173/verify-email?token=${args.token}`;
 
@@ -96,6 +97,9 @@ export const sendVerificationEmail = action({
         <p>This link will expire in 14 days.</p>
       `,
     });
+
+    console.log("error is", error);
+    
 
     return { success: true };
   },

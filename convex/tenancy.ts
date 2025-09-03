@@ -1,7 +1,5 @@
 import { action, mutation, query } from "./_generated/server";
-import { v } from "convex/values";
-import { internal } from "./_generated/api";
-import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";import { getAuthUserId } from "@convex-dev/auth/server";
 import { Resend } from "resend";
 
 export const addTenancy = mutation({

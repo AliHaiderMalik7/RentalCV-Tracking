@@ -8,10 +8,9 @@ import { toast, ToastContainer } from "react-toastify";
 
 interface ProfileViewProps {
     user: any;
-    onEditProfile: () => void;
 }
 
-export const ProfileView = ({ user, onEditProfile }: ProfileViewProps) => {
+export const ProfileView = ({ user }: ProfileViewProps) => {
     const currentUser = useQuery(api.auth.getCurrentUser);
     const updateProfile = useMutation(api.profile.updateProfile); // 🔥 hook for your mutation
 

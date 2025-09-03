@@ -209,7 +209,7 @@ const Properties = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {properties?.map(property => (
                             <PropertyCard
-                                key={property?.id}
+                                // key={property?.id}
                                 property={property}
                                 showActions={true}
                                 onDelete={() => handleDelete(property._id)}

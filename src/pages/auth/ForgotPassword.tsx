@@ -15,7 +15,7 @@ interface ForgotPasswordProps {
 }
 
 
-function ForgotPassword({ onEmailSubmitted, setStep, }: ForgotPasswordProps) {
+function ForgotPassword({ onEmailSubmitted, setStep }: ForgotPasswordProps) {
     const [email, setEmail] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [error, setError] = useState("");
@@ -51,17 +51,17 @@ function ForgotPassword({ onEmailSubmitted, setStep, }: ForgotPasswordProps) {
     };
 
 
-    const handleResetPassword = async (event: any) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        console.log("formDtaaaaa", formData);
-        const result = await signIn("password", {
-            flow: "reset-verification",
-        });
+    // const handleResetPassword = async (event: any) => {
+    //     event.preventDefault();
+    //     const formData = new FormData(event.currentTarget);
+    //     console.log("formDtaaaaa", formData);
+    //     const result = await signIn("password", {
+    //         flow: "reset-verification",
+    //     });
 
-        console.log("result forgot", result);
+    //     console.log("result forgot", result);
 
-    }
+    // }
 
 
 

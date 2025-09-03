@@ -21,7 +21,6 @@ import { api } from "../../../convex/_generated/api";
 import InputField from "@/components/common/InputField";
 import Dropdown from "@/components/common/Dropdown";
 import AuthBanner from "@/components/common/AuthBanner";
-import { generateUploadUrl } from "../../../convex/properties";
 import { Id } from "../../../convex/_generated/dataModel";
 
 type SignupProps = {
@@ -80,6 +79,8 @@ const Signup = ({ selectedRole }: SignupProps) => {
   const [success, setSuccess] = useState("");
   const [step, setStep] = useState<"signUp" | "signIn">("signUp");
   const checkUserExists = useMutation(api.auth.checkUserExists);
+  console.log("selectedRole", setStep);
+  
   // Mutations for automatic email verification
   const generateToken = useMutation(api.emailVerification.generateEmailVerificationToken);
   const sendEmail = useAction(api.emailVerification.sendVerificationEmail);

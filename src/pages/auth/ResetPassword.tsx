@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { FaLock, FaCheck } from "react-icons/fa";
+import { FaLock } from "react-icons/fa";
 import loginImage from "../../../public/banner.avif";
 import Button from "@/components/common/Button";
-import InputField from "@/components/common/InputField";
-
 import { useAuthActions } from "@convex-dev/auth/react";
-import { FaShieldAlt, FaArrowLeft, FaEye, FaEyeSlash, FaEnvelope } from 'react-icons/fa';
+import { FaShieldAlt, FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import AuthBanner from "@/components/common/AuthBanner";
@@ -16,16 +14,13 @@ interface ResetPasswordProps {
 
 }
 
-function ResetPassword({ step, setStep, email }: ResetPasswordProps) {
-    const { signIn } = useAuthActions();
-    const [otp, setOtp] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+function ResetPassword({ step, email }: ResetPasswordProps) {
+    const { signIn } = useAuthActions();  
+    //@ts-ignore
     const [error, setError] = useState("");
 
 
     const [showNewPassword, setShowNewPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate()
 
     useEffect(() => {

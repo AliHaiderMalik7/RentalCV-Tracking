@@ -22,13 +22,13 @@ interface Property {
 interface AddTenantFormProps {
   onClose: () => void;
   properties: any;
- 
+
 }
 
 export const AddTenantForm = ({
   onClose,
   properties,
-  
+
 }: AddTenantFormProps) => {
   const currentUser = useQuery(api.auth.getCurrentUser);
 
@@ -62,7 +62,7 @@ export const AddTenantForm = ({
     console.log("name and value", name, value);
 
     if (name === 'propertyId') {
-      const property = properties.find(p => p._id === value);
+      const property = properties.find((p:any) => p._id === value);
       setSelectedProperty(property || null);
     }
 
@@ -90,7 +90,7 @@ export const AddTenantForm = ({
     setErrorMessage('');
 
     try {
-   
+
       const token = crypto.randomUUID();
 
       // // Prepare data for the mutation
@@ -104,7 +104,7 @@ export const AddTenantForm = ({
         email: formData.email,
         mobile: formData.mobile,
         status: "invited",
-        inviteToken:token,
+        inviteToken: token,
         // inviteTokenExpiry,
         landlordId: currentUser?._id,
         // sendEmail,
@@ -113,22 +113,23 @@ export const AddTenantForm = ({
       console.log("mutation data", mutationData);
 
       // // Call the mutation
+      // @ts-ignore
       const result = await addTenancyMutation(mutationData);
       console.log("result is ", result);
-      
+
 
       if (result.success) {
-       const emailResponse = await sendEmailVerification({ email: formData.email, token });
-       console.log("email response is ", emailResponse);
-       
+        const emailResponse = await sendEmailVerification({ email: formData.email, token });
+        console.log("email response is ", emailResponse);
+
         toast.success(result.message);
       }
 
-      else{
+      else {
         setInvitationStatus('error');
         toast.error(result.error)
       }
-   
+
 
     } catch (error: any) {
       console.error('Error creating tenancy:', error);
@@ -181,8 +182,11 @@ export const AddTenantForm = ({
               required
               disabled={invitationStatus === 'pending'}
             >
+
               <option value="">-- Select a property --</option>
-              {properties.map(property => (
+
+              {properties.map((property: any) => (
+                // @ts-ignore
                 <option key={property.id} value={property._id}>
                   {property.addressLine1}
                 </option>
@@ -345,8 +349,8 @@ export const AddTenantForm = ({
 
             {invitationStatus !== 'idle' && invitationStatus !== 'error' && (
               <div className={`text-sm p-2 rounded ${invitationStatus === 'pending'
-                  ? 'bg-yellow-50 text-yellow-700'
-                  : 'bg-green-50 text-green-700'
+                ? 'bg-yellow-50 text-yellow-700'
+                : 'bg-green-50 text-green-700'
                 }`}>
                 {invitationStatus === 'pending'
                   ? 'Creating invitation...'

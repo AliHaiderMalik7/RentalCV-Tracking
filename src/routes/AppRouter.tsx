@@ -51,7 +51,6 @@ console.log("resetEmail", resetEmail);
           <Unauthenticated>
             <ForgotPassword
               onEmailSubmitted={handleEmailSubmitted}
-              step={step}
               setStep={setStep}
             />
           </Unauthenticated>
