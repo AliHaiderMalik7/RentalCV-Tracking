@@ -1,5 +1,5 @@
 import { action, mutation, query } from "./_generated/server";
-import { v } from "convex/values";import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values"; import { getAuthUserId } from "@convex-dev/auth/server";
 import { Resend } from "resend";
 
 export const addTenancy = mutation({
@@ -158,35 +158,34 @@ export const getTenancyDetailsByEmail = query({
 
 export const updateTenancyStatus = mutation({
     args: {
-      tenancyId: v.id("tenancies"),
-      status: v.union(
-        v.literal("invited"),
-        v.literal("pending"),
-        v.literal("active"),
-        v.literal("ended"),
-        v.literal("declined")
-      ),
-      tenantCountry: v.optional(v.union(v.string(), v.null())),
-      tenantRegion: v.optional(v.union(v.string(), v.null())),
+        tenancyId: v.id("tenancies"),
+        status: v.union(
+            v.literal("invited"),
+            v.literal("pending"),
+            v.literal("active"),
+            v.literal("ended"),
+            v.literal("declined")
+        ),
+        tenantCountry: v.optional(v.union(v.string(), v.null())),
+        tenantRegion: v.optional(v.union(v.string(), v.null())),
     },
     handler: async (ctx, args) => {
-      const tenancy = await ctx.db.get(args.tenancyId);
-      if (!tenancy) {
-        return { success: false, error: "Tenancy not found" };
-      }
-  
-      // Update tenancy fields
-      await ctx.db.patch(args.tenancyId, {
-        status: args.status,
-        tenantCountry: args.tenantCountry ?? tenancy.tenantCountry ?? null,
-        tenantRegion: args.tenantRegion ?? tenancy.tenantRegion ?? null,
-        updatedAt: Date.now(),
-      });
-  
-      return {
-        success: true,
-        message: `Tenancy status updated to '${args.status}' successfully`,
-      };
+        const tenancy = await ctx.db.get(args.tenancyId);
+        if (!tenancy) {
+            return { success: false, error: "Tenancy not found" };
+        }
+
+        // Update tenancy fields
+        await ctx.db.patch(args.tenancyId, {
+            status: args.status,
+            tenantCountry: args.tenantCountry ?? tenancy.tenantCountry ?? null,
+            tenantRegion: args.tenantRegion ?? tenancy.tenantRegion ?? null,
+            updatedAt: Date.now(),
+        });
+
+        return {
+            success: true,
+            message: `Tenancy status updated to '${args.status}' successfully`,
+        };
     },
-  });
-  
+});
