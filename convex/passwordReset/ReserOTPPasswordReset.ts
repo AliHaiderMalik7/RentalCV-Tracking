@@ -19,7 +19,7 @@
 //     const { error } = await resend.emails.send({
 //       // TODO: Update with your app name and email address
 //       from: process.env.AUTH_EMAIL ?? "My App <onboarding@resend.dev>",
-//       to: "alioneclout7@gmail.com",
+//       to: email,
 //       // TODO: Update with your app name
 //       subject: `Reset password in My App`,
 //       react: PasswordResetEmail({ code: token, expires }),

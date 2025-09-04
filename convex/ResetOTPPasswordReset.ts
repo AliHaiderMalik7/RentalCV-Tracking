@@ -1,8 +1,7 @@
 import Resend from "@auth/core/providers/resend";
 import { Resend as ResendAPI } from "resend";
 import { alphabet, generateRandomString } from "oslo/crypto";
- 
- 
+
 export const ResendOTPPasswordReset = Resend({
   id: "resend-otp",
   apiKey: process.env.AUTH_RESEND_KEY,
@@ -11,17 +10,17 @@ export const ResendOTPPasswordReset = Resend({
   },
   async sendVerificationRequest({ identifier: email, provider, token }) {
     console.log("email in verification request", email);
-    
+
     const resend = new ResendAPI(provider.apiKey);
     const { error } = await resend.emails.send({
-        from: "onboarding@resend.dev",
-        to: 'alioneclout7@gmail.com',
-        subject: `Reset your password in My App`,
-        text: "Your password reset code is " + token,
+      from: "onboarding@resend.dev",
+      to: email,
+      subject: `Reset your password in My App`,
+      text: "Your password reset code is " + token,
     });
- 
+
     if (error) {
-      throw new Error("Could not send");
+      throw new Error("Could not send email to " + email);
     }
   },
 });
@@ -39,7 +38,7 @@ export const ResendOTPPasswordReset = Resend({
 
 //     const { error } = await resend.emails.send({
 //         from: "onboarding@resend.dev",
-//         to: 'alioneclout7@gmail.com',
+//         to: email,
 //         subject: "Verify your email address",
 //         html: `
 //           <h1>Verify your email address</h1>
@@ -48,7 +47,7 @@ export const ResendOTPPasswordReset = Resend({
 //           <p>This link will expire in 24 hours.</p>
 //         `,
 //     });
- 
+
 //     if (error) {
 //       throw new Error("Could not send");
 //     }

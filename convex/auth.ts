@@ -1,18 +1,9 @@
 import { convexAuth, getAuthUserId } from "@convex-dev/auth/server";
 import { Password } from "@convex-dev/auth/providers/Password";
-// import { Email } from "@convex-dev/auth/providers/Email";
 import { Anonymous } from "@convex-dev/auth/providers/Anonymous";
-
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-// import { ResendOTPPasswordReset } from "./ResetOTPPasswordReset";
-// import { verify } from "crypto";
-
-// export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
-//   providers: [Password({  reset: ResendOTPPasswordReset})],
-
-
-// });
+import { ResendOTPPasswordReset } from "./ResetOTPPasswordReset";
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
@@ -23,20 +14,18 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
           emailVerified: false,
         };
       },
+      reset: ResendOTPPasswordReset,
     }),
-    Anonymous
+    Anonymous,
   ],
 });
-
-
-
 
 export const validateSession = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     return {
       isValid: !!identity,
-      user: identity
+      user: identity,
     };
   },
 });
@@ -44,12 +33,6 @@ export const validateSession = query({
 export const checkUserExists = mutation({
   args: { email: v.string() },
   handler: async (ctx, { email }) => {
-    // Check both auth system and your custom users table
-
-    // 1. Check Convex auth system (for registered users)
-    // const tokenIdentifier = `password|${email}`;
-
-    // 2. Check your custom users table
     const userRecord = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", email))
@@ -57,7 +40,7 @@ export const checkUserExists = mutation({
 
     return {
       exists: !!userRecord,
-      inUsersTable: !!userRecord
+      inUsersTable: !!userRecord,
     };
   },
 });
@@ -69,62 +52,61 @@ export const updateUser = mutation({
     lastName: v.optional(v.string()),
     phone: v.optional(v.string()),
     gender: v.optional(
-      v.union(v.literal("male"), v.literal("female"), v.literal("other"))
+      v.union(v.literal("male"), v.literal("female"), v.literal("other")),
     ),
     address: v.optional(v.string()),
     city: v.optional(v.string()),
     state: v.optional(v.string()),
     postalCode: v.optional(v.string()),
     roles: v.optional(
-      v.union(v.literal("tenant"), v.literal("landlord"), v.literal("admin"))
+      v.union(v.literal("tenant"), v.literal("landlord"), v.literal("admin")),
     ),
     createdAt: v.optional(v.number()),
-
-    // ✅ New optional landlord verification fields
     idVerificationDocs: v.optional(v.array(v.id("_storage"))),
     proofOfAddress: v.optional(v.array(v.id("_storage"))),
     landlordLicense: v.optional(v.array(v.id("_storage"))),
     verified: v.optional(v.boolean()),
-
   },
   handler: async (ctx, args) => {
-    // Check if user already exists
     const existing = await ctx.db
       .query("users")
       .withIndex("email", (q) => q.eq("email", args.email))
       .first();
 
+    const userData = {
+      firstName: args.firstName,
+      lastName: args.lastName,
+      phone: args.phone,
+      gender: args.gender,
+      address: args.address,
+      city: args.city,
+      state: args.state,
+      postalCode: args.postalCode,
+      roles: args.roles,
+      idVerificationDocs: args.idVerificationDocs,
+      proofOfAddress: args.proofOfAddress,
+      landlordLicense: args.landlordLicense,
+      verified: args.verified,
+    };
+
     if (existing) {
-      // ✅ Update existing user
-      await ctx.db.patch(existing._id, {
-        firstName: args.firstName,
-        lastName: args.lastName,
-        phone: args.phone,
-        gender: args.gender,
-        address: args.address,
-        city: args.city,
-        state: args.state,
-        postalCode: args.postalCode,
-        roles: args.roles,
-        idVerificationDocs: args.idVerificationDocs,
-        proofOfAddress: args.proofOfAddress,
-        landlordLicense: args.landlordLicense,
-        verified: args.verified,
-      });
+      await ctx.db.patch(existing._id, userData);
+      return { success: true, userId: existing._id, action: "updated" };
     } else {
-      // ✅ Create new user
-      await ctx.db.insert("users", args);
+      const userId = await ctx.db.insert("users", {
+        ...args,
+        createdAt: args.createdAt ?? Date.now(),
+      });
+      return { success: true, userId, action: "created" };
     }
   },
 });
-
-
 
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
-    if (userId === null) {
+    if (!userId) {
       return null;
     }
     return await ctx.db.get(userId);
@@ -160,17 +142,16 @@ export const isProfileComplete = query({
       return false;
     }
     const user = await ctx.db.get(userId);
-    // Check if user has completed their profile (has required fields)
     return !!(user?.firstName && user?.lastName && user?.roles);
   },
 });
 
 export const checkEmailVerifiedByEmail = mutation({
   args: { email: v.string() },
-  handler: async (ctx, args) => {
+  handler: async (ctx, { email }) => {
     const user = await ctx.db
       .query("users")
-      .withIndex("email", (q) => q.eq("email", args.email))
+      .withIndex("email", (q) => q.eq("email", email))
       .unique();
 
     if (!user) {
@@ -184,4 +165,3 @@ export const checkEmailVerifiedByEmail = mutation({
     return { success: true };
   },
 });
-
