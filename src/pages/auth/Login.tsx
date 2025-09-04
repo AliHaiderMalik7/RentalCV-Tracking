@@ -163,7 +163,7 @@ const Login = () => {
 
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between pt-2">
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <input
                   type="checkbox"
                   id="remember"
@@ -177,7 +177,7 @@ const Login = () => {
                 >
                   Remember me
                 </label>
-              </div>
+              </div> */}
               <div>
                 <a
                   href="/forgot"
