@@ -9,6 +9,13 @@ import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ResetPassword from "@/pages/auth/ResetPassword";
 import EmailVerification from "@/pages/auth/EmailVerification";
 import TenantInviteVerification from "@/components/home/landlord/tenant/TenantInviteVerification";
+import TenantInviteAcceptance from "@/pages/tenant/InviteAcceptance";
+import TenantSignup from "@/pages/tenant/TenantSignup";
+import LandlordVerification from "@/pages/auth/LandlordVerification";
+import LandlordOnboarding from "@/pages/landlord/LandlordOnboarding";
+import TenantPropertyDetailsForm from "@/components/home/tenant/TenantPropertyDetailsForm";
+import TenantOnboarding from "@/pages/auth/TenantOnboarding";
+import LandlordReviewForm from "@/components/reviews/LandlordReviewForm";
 
 export function AppRoutes() {
   const navigate = useNavigate();
@@ -16,7 +23,7 @@ export function AppRoutes() {
   const [resetEmail, setResetEmail] = useState<string>();
   const { isLoading, isAuthenticated } = useConvexAuth();
   const [step, setStep] = useState<"forgot" | { email: string }>("forgot");
-console.log("resetEmail", resetEmail);
+  console.log("resetEmail", resetEmail);
 
   console.log("isAuthenticated", isAuthenticated);
   const handleRoleSelect = (role: "tenant" | "landlord") => {
@@ -96,14 +103,43 @@ console.log("resetEmail", resetEmail);
         path="/verify-email"
         element={
           //   <Unauthenticated>
-          <EmailVerification  />
-
-
+          <EmailVerification />
         }
       />
 
       <Route path="/verify-invite" element={<TenantInviteVerification />} />
+      <Route path="/tenant/invite" element={<TenantInviteAcceptance />} />
+      <Route path="/tenant/signup" element={<TenantSignup />} />
 
+      <Route path="/landlord-verification" element={<LandlordVerification />} />
+      <Route path="/landlord/onboarding" element={<LandlordOnboarding />} />
+
+      <Route
+        path="/tenant/add-property"
+        element={
+          <Authenticated>
+            <TenantPropertyDetailsForm />
+          </Authenticated>
+        }
+      />
+
+      <Route
+        path="/tenant/onboarding"
+        element={
+          <Authenticated>
+            <TenantOnboarding />
+          </Authenticated>
+        }
+      />
+
+      <Route
+        path="/landlord/review-tenant"
+        element={
+          <Authenticated>
+            <LandlordReviewForm />
+          </Authenticated>
+        }
+      />
 
       <Route
         path="/home"

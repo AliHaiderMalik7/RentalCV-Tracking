@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { useAction, useMutation, useQuery } from 'convex/react';
-import { api } from '../../../../../convex/_generated/api';
-import { toast, ToastContainer } from 'react-toastify';
+import { useState } from "react";
+import { useAction, useMutation, useQuery } from "convex/react";
+import { api } from "../../../../../convex/_generated/api";
+import { toast, ToastContainer } from "react-toastify";
+import { Id } from "../../../../../convex/_generated/dataModel";
 
 interface TenantFormData {
   propertyId: string;
@@ -17,126 +18,168 @@ interface TenantFormData {
 interface Property {
   id: string;
   addressLine1: string;
+  city: string;
 }
 
 interface AddTenantFormProps {
   onClose: () => void;
   properties: any;
-
 }
 
-export const AddTenantForm = ({
-  onClose,
-  properties,
-
-}: AddTenantFormProps) => {
+export const AddTenantForm = ({ onClose, properties }: AddTenantFormProps) => {
   const currentUser = useQuery(api.auth.getCurrentUser);
 
   const [formData, setFormData] = useState<TenantFormData>({
-    propertyId: '',
-    startDate: '',
-    endDate: '',
-    rentAmount: '',
-    depositAmount: '',
-    name: '',
-    email: '',
-    mobile: ''
+    propertyId: "",
+    startDate: "",
+    endDate: "",
+    rentAmount: "",
+    depositAmount: "",
+    name: "",
+    email: "",
+    mobile: "",
   });
 
   const sendEmailVerification = useAction(api.tenancy.sendInviteEmail);
 
-
-
-
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [invitationStatus, setInvitationStatus] = useState<'idle' | 'pending' | 'sent' | 'error'>('idle');
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(
+    null,
+  );
+  const [invitationStatus, setInvitationStatus] = useState<
+    "idle" | "pending" | "sent" | "error"
+  >("idle");
   const [sendEmail, setSendEmail] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   // Use the addTenancy mutation
   const addTenancyMutation = useMutation(api.tenancy.addTenancy);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
 
     console.log("name and value", name, value);
 
-    if (name === 'propertyId') {
-      const property = properties.find((p:any) => p._id === value);
+    if (name === "propertyId") {
+      const property = properties.find((p: any) => p._id === value);
       setSelectedProperty(property || null);
     }
 
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("formData", formData);
-    console.log("properties are", properties);
 
     if (!formData.propertyId || !selectedProperty) {
-      alert('Please select a property');
+      toast.error("Please select a property");
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      alert('Please enter a valid email address');
+      toast.error("Please enter a valid email address");
       return;
     }
 
-    setInvitationStatus('pending');
-    setErrorMessage('');
+    if (!formData.startDate) {
+      toast.error("Please select a start date");
+      return;
+    }
+
+    if (!formData.endDate) {
+      toast.error("Please select an end date");
+      return;
+    }
+
+    if (new Date(formData.startDate) >= new Date(formData.endDate)) {
+      toast.error("End date must be after start date");
+      return;
+    }
+
+    if (!currentUser?._id) {
+      toast.error("You must be logged in to send invitations");
+      return;
+    }
+
+    setInvitationStatus("pending");
+    setErrorMessage("");
 
     try {
-
-      const token = crypto.randomUUID();
-
-      // // Prepare data for the mutation
+      // Create tenancy invitation using updated backend
       const mutationData = {
-        propertyId: formData.propertyId,
+        propertyId: formData.propertyId as Id<"properties">,
         startDate: new Date(formData.startDate).getTime(),
         endDate: new Date(formData.endDate).getTime(),
-        // monthlyRent: parseFloat(formData.rentAmount),
-        // depositAmount: formData.depositAmount ? parseFloat(formData.depositAmount) : 0,
         name: formData.name,
         email: formData.email,
         mobile: formData.mobile,
-        status: "invited",
-        inviteToken: token,
-        // inviteTokenExpiry,
-        landlordId: currentUser?._id,
-        // sendEmail,
+        landlordId: currentUser._id,
       };
 
-      console.log("mutation data", mutationData);
-
-      // // Call the mutation
-      // @ts-ignore
       const result = await addTenancyMutation(mutationData);
-      console.log("result is ", result);
 
+      if (result.success && result.inviteToken) {
+        // Send invitation email using the token from the result
+        if (sendEmail) {
+          const propertyAddress = selectedProperty
+            ? `${selectedProperty.addressLine1}, ${selectedProperty.city}`
+            : "Your Property";
 
-      if (result.success) {
-        const emailResponse = await sendEmailVerification({ email: formData.email, token });
-        console.log("email response is ", emailResponse);
+          const emailResponse = await sendEmailVerification({
+            email: formData.email,
+            token: result.inviteToken,
+            phone: formData.mobile,
+            landlordName:
+              `${currentUser?.firstName} ${currentUser?.lastName}` ||
+              "Your Landlord",
+            propertyAddress,
+            tenantName: formData.name,
+          });
 
-        toast.success(result.message);
+          if (!emailResponse.success) {
+            console.warn("Email sending failed:", emailResponse.error);
+            toast.warning(
+              "Invitation created but email failed to send. Please check email settings.",
+            );
+          }
+        }
+
+        setInvitationStatus("sent");
+        toast.success("Tenant invitation sent successfully!");
+
+        // Reset form after successful submission
+        setFormData({
+          propertyId: "",
+          startDate: "",
+          endDate: "",
+          rentAmount: "",
+          depositAmount: "",
+          name: "",
+          email: "",
+          mobile: "",
+        });
+        setSelectedProperty(null);
+
+        // Close the form after a brief delay
+        setTimeout(() => {
+          onClose();
+        }, 2000);
+      } else {
+        setInvitationStatus("error");
+        toast.error(result.error || "Failed to create invitation");
+        setErrorMessage(result.error || "Unknown error occurred");
       }
-
-      else {
-        setInvitationStatus('error');
-        toast.error(result.error)
-      }
-
-
     } catch (error: any) {
-      console.error('Error creating tenancy:', error);
-      setInvitationStatus('error');
-      setErrorMessage(
-        error.message || 'Failed to create tenancy invitation. Please try again.'
-      );
+      console.error("Error creating tenancy:", error);
+      setInvitationStatus("error");
+      const errorMsg =
+        error.message ||
+        "Failed to create tenancy invitation. Please try again.";
+      setErrorMessage(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
@@ -153,7 +196,7 @@ export const AddTenantForm = ({
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600"
-          disabled={invitationStatus === 'pending'}
+          disabled={invitationStatus === "pending"}
         >
           ×
         </button>
@@ -169,7 +212,9 @@ export const AddTenantForm = ({
       <form onSubmit={handleSubmit}>
         {/* Property Selection */}
         <div className="mb-6">
-          <h4 className="font-medium text-gray-700 mb-3">Property Information</h4>
+          <h4 className="font-medium text-gray-700 mb-3">
+            Property Information
+          </h4>
           <div className="w-full">
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Select Property*
@@ -180,9 +225,8 @@ export const AddTenantForm = ({
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
-              disabled={invitationStatus === 'pending'}
+              disabled={invitationStatus === "pending"}
             >
-
               <option value="">-- Select a property --</option>
 
               {properties.map((property: any) => (
@@ -219,7 +263,7 @@ export const AddTenantForm = ({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
-                disabled={invitationStatus === 'pending'}
+                disabled={invitationStatus === "pending"}
               />
             </div>
             <div>
@@ -233,7 +277,7 @@ export const AddTenantForm = ({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
-                disabled={invitationStatus === 'pending'}
+                disabled={invitationStatus === "pending"}
               />
             </div>
           </div>
@@ -281,7 +325,9 @@ export const AddTenantForm = ({
 
         {/* Tenant Contact Section */}
         <div className="mb-6">
-          <h4 className="font-medium text-gray-700 mb-3">Tenant Contact Info</h4>
+          <h4 className="font-medium text-gray-700 mb-3">
+            Tenant Contact Info
+          </h4>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -295,7 +341,7 @@ export const AddTenantForm = ({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
-                disabled={invitationStatus === 'pending'}
+                disabled={invitationStatus === "pending"}
               />
             </div>
             <div>
@@ -309,7 +355,7 @@ export const AddTenantForm = ({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
-                disabled={invitationStatus === 'pending'}
+                disabled={invitationStatus === "pending"}
               />
             </div>
             <div>
@@ -322,7 +368,7 @@ export const AddTenantForm = ({
                 value={formData.mobile}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                disabled={invitationStatus === 'pending'}
+                disabled={invitationStatus === "pending"}
               />
             </div>
           </div>
@@ -340,21 +386,24 @@ export const AddTenantForm = ({
                 checked={sendEmail}
                 onChange={(e) => setSendEmail(e.target.checked)}
                 className="h-4 w-4 text-blue-600 rounded"
-                disabled={invitationStatus === 'pending'}
+                disabled={invitationStatus === "pending"}
               />
               <label htmlFor="sendEmail" className="ml-2 text-sm text-gray-600">
                 Send Email Invitation
               </label>
             </div>
 
-            {invitationStatus !== 'idle' && invitationStatus !== 'error' && (
-              <div className={`text-sm p-2 rounded ${invitationStatus === 'pending'
-                ? 'bg-yellow-50 text-yellow-700'
-                : 'bg-green-50 text-green-700'
-                }`}>
-                {invitationStatus === 'pending'
-                  ? 'Creating invitation...'
-                  : 'Invitation created successfully!'}
+            {invitationStatus !== "idle" && invitationStatus !== "error" && (
+              <div
+                className={`text-sm p-2 rounded ${
+                  invitationStatus === "pending"
+                    ? "bg-yellow-50 text-yellow-700"
+                    : "bg-green-50 text-green-700"
+                }`}
+              >
+                {invitationStatus === "pending"
+                  ? "Creating invitation..."
+                  : "Invitation created successfully!"}
               </div>
             )}
           </div>
@@ -366,18 +415,18 @@ export const AddTenantForm = ({
             type="button"
             onClick={onClose}
             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-            disabled={invitationStatus === 'pending'}
+            disabled={invitationStatus === "pending"}
           >
             Cancel
           </button>
           <button
             type="submit"
             className="px-4 py-2 bg-[#0369a1] hover:bg-[#075985] text-white rounded-md disabled:opacity-50"
-            disabled={invitationStatus === 'pending'}
+            disabled={invitationStatus === "pending"}
           >
-            {invitationStatus === 'pending'
-              ? 'Creating Invitation...'
-              : 'Save & Invite Tenant'}
+            {invitationStatus === "pending"
+              ? "Creating Invitation..."
+              : "Save & Invite Tenant"}
           </button>
         </div>
       </form>

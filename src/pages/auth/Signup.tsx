@@ -30,7 +30,6 @@ type SignupProps = {
 const Signup = ({ selectedRole }: SignupProps) => {
   const navigate = useNavigate();
 
-
   useEffect(() => {
     if (!selectedRole) {
       navigate("/select-role");
@@ -51,7 +50,7 @@ const Signup = ({ selectedRole }: SignupProps) => {
           className: "premium-toast",
           // bodyClassName: "premium-toast-body",
           progressClassName: "premium-toast-progress",
-        }
+        },
       );
     }
   }, [selectedRole, navigate]);
@@ -80,11 +79,13 @@ const Signup = ({ selectedRole }: SignupProps) => {
   const [step, setStep] = useState<"signUp" | "signIn">("signUp");
   const checkUserExists = useMutation(api.auth.checkUserExists);
   console.log("selectedRole", setStep);
-  
+
   // Mutations for automatic email verification
-  const generateToken = useMutation(api.emailVerification.generateEmailVerificationToken);
+  const generateToken = useMutation(
+    api.emailVerification.generateEmailVerificationToken,
+  );
   const sendEmail = useAction(api.emailVerification.sendVerificationEmail);
-  const updateUser = useMutation(api.auth.updateUser)
+  const updateUser = useMutation(api.auth.updateUser);
   const generateUrl = useMutation(api.properties.generateUrl);
 
   const { signIn } = useAuthActions();
@@ -122,16 +123,12 @@ const Signup = ({ selectedRole }: SignupProps) => {
     }));
   };
 
-
-
-
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
     setSuccess("");
     try {
-
       console.log("im here", formData);
 
       if (!formData.gender) {
@@ -144,13 +141,11 @@ const Signup = ({ selectedRole }: SignupProps) => {
       const proofDocs = await processFiles(formData.proofOfAddress);
       const landlordDocs = await processFiles(formData.landlordLicense);
 
-
-      console.log('exists', exists, inUsersTable);
+      console.log("exists", exists, inUsersTable);
 
       if (exists && inUsersTable) {
-        toast.error("User already Registered!")
-      }
-      else {
+        toast.error("User already Registered!");
+      } else {
         console.log("formData", data);
 
         signIn("password", {
@@ -191,25 +186,28 @@ const Signup = ({ selectedRole }: SignupProps) => {
               idVerificationDocs: idDocs,
               proofOfAddress: proofDocs,
               landlordLicense: landlordDocs,
-
             });
             console.log("updateUserResponse", updateUserResponse);
-            toast.success("Account created! Please check your email to verify your account.");
+            toast.success(
+              "Account created! Please check your email to verify your account.",
+            );
 
             setTimeout(() => {
-              navigate('/login')
-
-            }, 3000)
+              if (selectedRole === "tenant") {
+                navigate("/tenant/onboarding");
+              } else {
+                navigate("/login");
+              }
+            }, 3000);
           } catch (error) {
             console.error("Failed to send verification email:", error);
-            toast.success("Account created! Please verify your email to continue.");
+            toast.success(
+              "Account created! Please verify your email to continue.",
+            );
           }
           // }
         });
-
       }
-
-
     } catch (err: any) {
       console.log("err", err.message);
 
@@ -218,28 +216,26 @@ const Signup = ({ selectedRole }: SignupProps) => {
     }
   };
 
-
   const handleLogin = () => {
-    navigate("/login")
-  }
+    navigate("/login");
+  };
 
-  const handleVerificationUpload = (field: keyof typeof formData, files: File[]) => {
+  const handleVerificationUpload = (
+    field: keyof typeof formData,
+    files: File[],
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: [...prev[field], ...files], // append if multiple files
     }));
   };
 
-
   return (
     <div className="min-h-screen flex bg-slate-50 font-sans antialiased">
       {/* Left Side - Premium Image Section */}
       <div className="hidden lg:flex lg:w-1/2 h-screen sticky top-0 flex-col items-center justify-center bg-gray-200 p-8 relative">
         {/* Image Container - Centered with proper aspect ratio */}
-        <AuthBanner
-          imageSrc={signupImage}
-
-        />
+        <AuthBanner imageSrc={signupImage} />
       </div>
 
       {/* Right Side - Elegant Form */}
@@ -255,10 +251,7 @@ const Signup = ({ selectedRole }: SignupProps) => {
             </p>
           </div>
 
-          <form
-            className="p-8 space-y-6"
-            onSubmit={(e) => handleSubmit(e)}
-          >
+          <form className="p-8 space-y-6" onSubmit={(e) => handleSubmit(e)}>
             {/* Name Row */}
             <div className="grid grid-cols-2 gap-6">
               <InputField
@@ -416,7 +409,9 @@ const Signup = ({ selectedRole }: SignupProps) => {
                 </h3>
                 <p className="text-sm text-slate-600">
                   Build trust with tenants by uploading verification documents.
-                  Once verified, you’ll receive the prestigious <span className="font-semibold">Verified Landlord Badge</span>.
+                  Once verified, you’ll receive the prestigious{" "}
+                  <span className="font-semibold">Verified Landlord Badge</span>
+                  .
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -426,7 +421,9 @@ const Signup = ({ selectedRole }: SignupProps) => {
                       <FaUpload className="mx-auto text-gray-400 text-2xl" />
                       <p className="text-sm text-gray-600 mt-2">
                         Upload Photo ID <br />
-                        <span className="text-xs text-gray-500">(Passport / Driver’s License)</span>
+                        <span className="text-xs text-gray-500">
+                          (Passport / Driver’s License)
+                        </span>
                       </p>
                       <input
                         type="file"
@@ -434,7 +431,10 @@ const Signup = ({ selectedRole }: SignupProps) => {
                         accept="image/*,.pdf"
                         multiple
                         onChange={(e) =>
-                          handleVerificationUpload("idVerificationDocs", Array.from(e.target.files || []))
+                          handleVerificationUpload(
+                            "idVerificationDocs",
+                            Array.from(e.target.files || []),
+                          )
                         }
                       />
                     </div>
@@ -446,7 +446,9 @@ const Signup = ({ selectedRole }: SignupProps) => {
                       <FaUpload className="mx-auto text-gray-400 text-2xl" />
                       <p className="text-sm text-gray-600 mt-2">
                         Upload Proof of Address <br />
-                        <span className="text-xs text-gray-500">(Utility Bill, Bank Statement)</span>
+                        <span className="text-xs text-gray-500">
+                          (Utility Bill, Bank Statement)
+                        </span>
                       </p>
                       <input
                         type="file"
@@ -454,7 +456,10 @@ const Signup = ({ selectedRole }: SignupProps) => {
                         accept="image/*,.pdf"
                         multiple
                         onChange={(e) =>
-                          handleVerificationUpload("proofOfAddress", Array.from(e.target.files || []))
+                          handleVerificationUpload(
+                            "proofOfAddress",
+                            Array.from(e.target.files || []),
+                          )
                         }
                       />
                     </div>
@@ -466,7 +471,9 @@ const Signup = ({ selectedRole }: SignupProps) => {
                       <FaUpload className="mx-auto text-gray-400 text-2xl" />
                       <p className="text-sm text-gray-600 mt-2">
                         Upload Landlord License / Company Details <br />
-                        <span className="text-xs text-gray-500">(Optional)</span>
+                        <span className="text-xs text-gray-500">
+                          (Optional)
+                        </span>
                       </p>
                       <input
                         type="file"
@@ -474,12 +481,14 @@ const Signup = ({ selectedRole }: SignupProps) => {
                         accept="image/*,.pdf"
                         multiple
                         onChange={(e) =>
-                          handleVerificationUpload("landlordLicense", Array.from(e.target.files || []))
+                          handleVerificationUpload(
+                            "landlordLicense",
+                            Array.from(e.target.files || []),
+                          )
                         }
                       />
                     </div>
                   </label>
-
                 </div>
               </div>
             )}
@@ -492,7 +501,10 @@ const Signup = ({ selectedRole }: SignupProps) => {
                 className="h-4 w-4 text-[#0369a1] focus:ring-[#0369a1] border-slate-300 rounded"
                 required
               />
-              <label htmlFor="terms" className="ml-2 block text-sm text-slate-600">
+              <label
+                htmlFor="terms"
+                className="ml-2 block text-sm text-slate-600"
+              >
                 I agree to the{" "}
                 <a href="#" className="text-[#0369a1] hover:text-[#0284c7]">
                   Terms
@@ -503,8 +515,6 @@ const Signup = ({ selectedRole }: SignupProps) => {
                 </a>
               </label>
             </div>
-
-
 
             {/* Submit Button */}
             <div className="pt-4">
@@ -530,7 +540,9 @@ const Signup = ({ selectedRole }: SignupProps) => {
               </button>
             </div>
             {error && <div className="text-red-600 text-center">{error}</div>}
-            {success && <div className="text-green-600 text-center">{success}</div>}
+            {success && (
+              <div className="text-green-600 text-center">{success}</div>
+            )}
           </form>
           <ToastContainer />
 

@@ -18,15 +18,14 @@ const Login = () => {
   const [step, setStep] = useState<"signUp" | "signIn">("signIn");
   const [error, setError] = useState<String | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  // const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { signIn } = useAuthActions();
 
-  const checkEmailVerifiedByEmail = useMutation(api.auth.checkEmailVerifiedByEmail);
-  console.log("error", error,setStep);
-  
-
-
+  const checkEmailVerifiedByEmail = useMutation(
+    api.auth.checkEmailVerifiedByEmail,
+  );
+  console.log("error", error, setStep);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -41,21 +40,21 @@ const Login = () => {
     const data = new FormData(event.currentTarget);
     console.log("formData", data);
 
-
     try {
+      const response = await checkEmailVerifiedByEmail({
+        email: formData.email,
+      });
 
-    const response =  await checkEmailVerifiedByEmail({ email: formData.email });
-
-    if (!response.success) {
-      if (response.code === "EMAIL_NOT_VERIFIED") {
-        toast.error("Please verify your email before logging in.");
-        return;
+      if (!response.success) {
+        if (response.code === "EMAIL_NOT_VERIFIED") {
+          toast.error("Please verify your email before logging in.");
+          return;
+        }
+        if (response.code === "USER_NOT_FOUND") {
+          toast.error("User not found.");
+          return;
+        }
       }
-      if (response.code === "USER_NOT_FOUND") {
-        toast.error("User not found.");
-        return;
-      }
-    }
       const result = await signIn("password", {
         flow: "signIn",
         email: formData.email,
@@ -65,10 +64,8 @@ const Login = () => {
 
       if (result.signingIn) {
         navigate("/home"); // Redirect on success
-
       }
       console.log("Login successful", result);
-
     } catch (err) {
       console.error("Login error:", err);
 
@@ -83,7 +80,6 @@ const Login = () => {
 
       setError(errorMessage);
       toast.error(errorMessage);
-
     } finally {
       // setLoading(false);
     }
@@ -91,18 +87,14 @@ const Login = () => {
 
   const handleRoleSelection = async () => {
     navigate("/select-role");
-
-  }
+  };
 
   return (
     <div className="min-h-screen flex bg-slate-50 font-sans antialiased">
       <ToastContainer />
       {/* Left Side - Premium Image Section */}
       <div className="hidden lg:flex lg:w-1/2 h-screen sticky top-0 flex-col items-center justify-center bg-gray-200 p-8 relative">
-        <AuthBanner
-          imageSrc={loginImage}
-
-        />
+        <AuthBanner imageSrc={loginImage} />
       </div>
 
       {/* Right Side - Elegant Form */}
