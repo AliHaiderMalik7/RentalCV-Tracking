@@ -453,8 +453,8 @@ const TenantInviteAcceptance = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  <div className="container max-w-3xl mx-auto px-4 py-8 bg-white rounded-xl shadow">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-8">
             {/* Header */}
