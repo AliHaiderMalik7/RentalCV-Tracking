@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useNavigate } from "react-router-dom";
-import "./Sidebar.css"; 
+import "./sidebar.css"; 
 
 interface SidebarProps {
   role?: 'landlord' | 'tenant';
