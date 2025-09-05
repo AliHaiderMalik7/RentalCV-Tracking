@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import Select from "react-select";
 import Button from "../../components/common/Button";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -392,7 +392,7 @@ const TenantInviteAcceptance = () => {
 
           toast.success("Logged in successfully!");
         }
-       
+
       }
 
       // Wait a moment for auth to settle, then accept the invitation
@@ -457,7 +457,7 @@ const TenantInviteAcceptance = () => {
           toast.info(
             "We've flagged this tenancy for review. Our team will investigate.",
           );
-          navigate("/login");
+          navigate("/home");
         }
       } else {
         toast.error(result.error || "Failed to process confirmation");
@@ -481,6 +481,7 @@ const TenantInviteAcceptance = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <ToastContainer/>
       <div className="container max-w-3xl mx-auto px-4 py-8 bg-white rounded-xl shadow">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-8">
@@ -602,7 +603,7 @@ const TenantInviteAcceptance = () => {
                 <Button
                   onClick={handleCountryConfirm}
                   disabled={!selectedCountry}
-                  className="w-full"
+                  className="w-full bg-[#0369a1] hover:bg-[#075985] text-white rounded-md disabled:opacity-50 h-10"
                 >
                   Continue
                 </Button>
@@ -672,10 +673,11 @@ const TenantInviteAcceptance = () => {
                 <Button
                   onClick={handleDisclaimerAccept}
                   disabled={!hasScrolledDisclaimer || loading}
-                  className="w-full"
+                  className="w-full bg-[#0369a1] hover:bg-[#075985] text-white rounded-md disabled:opacity-50 h-10"
                 >
                   {loading ? "Processing..." : "Accept & Continue"}
                 </Button>
+
               </div>
             )}
 
@@ -690,8 +692,8 @@ const TenantInviteAcceptance = () => {
                     type="button"
                     onClick={() => setIsNewUser(true)}
                     className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${isNewUser
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-600"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600"
                       }`}
                   >
                     Create Account
@@ -700,8 +702,8 @@ const TenantInviteAcceptance = () => {
                     type="button"
                     onClick={() => setIsNewUser(false)}
                     className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${!isNewUser
-                        ? "bg-white text-gray-900 shadow-sm"
-                        : "text-gray-600"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600"
                       }`}
                   >
                     Sign In
@@ -808,13 +810,18 @@ const TenantInviteAcceptance = () => {
                     </div>
                   )}
 
-                  <Button type="submit" disabled={loading} className="w-full" >
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-[#0369a1] hover:bg-[#075985] text-white rounded-md disabled:opacity-50 h-10"
+                  >
                     {loading
                       ? "Processing..."
                       : isNewUser
                         ? "Create Account & Continue"
                         : "Sign In & Continue"}
                   </Button>
+
                 </form>
               </div>
             )}
@@ -871,23 +878,22 @@ const TenantInviteAcceptance = () => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    onClick={() => handleTenancyConfirmation(true)}
-                    disabled={loading}
-                    className="flex-1"
-                  >
-                    {loading
-                      ? "Processing..."
-                      : "Confirm - Details are Correct"}
-                  </Button>
+                <Button
+  onClick={() => handleTenancyConfirmation(true)}
+  disabled={loading}
+  className="flex-1 bg-[#0369a1] hover:bg-[#075985] text-white rounded-md disabled:opacity-50 h-10"
+>
+  {loading ? "Processing..." : "Confirm - Details are Correct"}
+</Button>
 
-                  <Button
-                    onClick={() => handleTenancyConfirmation(false)}
-                    disabled={loading}
-                    className="flex-1 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-                  >
-                    Flag as Incorrect
-                  </Button>
+<Button
+  onClick={() => handleTenancyConfirmation(false)}
+  disabled={loading}
+  className="flex-1 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-md disabled:opacity-50 h-10"
+>
+  Flag as Incorrect
+</Button>
+
                 </div>
               </div>
             )}

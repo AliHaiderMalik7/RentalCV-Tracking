@@ -2,6 +2,7 @@ import { action, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Resend } from "resend";
+import { Id } from "./_generated/dataModel";
 
 export enum TenancyStatus {
     INVITED = "invited",
@@ -306,6 +307,67 @@ export const getTenancyDetailsByEmail = query({
         return tenancy;
     },
 });
+
+export const getAllTenanciesByEmail = query({
+    args: { email: v.string() }, // tenant's email
+    handler: async (ctx, { email }) => {
+      const userId = await getAuthUserId(ctx);
+      if (!userId) {
+        throw new Error("User must be authenticated");
+      }
+  
+      // Fetch all tenancies linked to this email
+      const tenancies = await ctx.db
+        .query("tenancies")
+        .withIndex("by_tenant_email", (q) => q.eq("invitedTenantEmail", email))
+        .collect();
+  
+      if (!tenancies.length) {
+        throw new Error("No tenancies found for this email");
+      }
+  
+      // Deduplicate landlordIds and propertyIds, filtering out undefined
+      const landlordIds = [
+        ...new Set(tenancies.map((t) => t.landlordId).filter(Boolean)),
+      ] as Id<"users">[];
+  
+      const propertyIds = [
+        ...new Set(tenancies.map((t) => t.propertyId).filter(Boolean)),
+      ] as Id<"properties">[];
+  
+      // Fetch landlords by id
+      const landlords = await Promise.all(
+        landlordIds.map((id) => ctx.db.get(id))
+      );
+  
+      // Fetch properties by id
+      const properties = await Promise.all(
+        propertyIds.map((id) => ctx.db.get(id))
+      );
+  
+      // Build lookup maps (filter out nulls)
+      const landlordMap = new Map(
+        landlords.filter((l): l is NonNullable<typeof l> => l !== null).map((l) => [l._id, l])
+      );
+  
+      const propertyMap = new Map(
+        properties.filter((p): p is NonNullable<typeof p> => p !== null).map((p) => [p._id, p])
+      );
+  
+      // Attach landlord + property details to each tenancy
+      const enrichedTenancies = tenancies.map((t) => ({
+        ...t,
+        landlord: t.landlordId ? landlordMap.get(t.landlordId) || null : null,
+        property: t.propertyId ? propertyMap.get(t.propertyId) || null : null,
+      }));
+  
+      return enrichedTenancies;
+    },
+  });
+  
+  
+  
+  
 
 export const updateTenancyStatus = mutation({
     args: {
