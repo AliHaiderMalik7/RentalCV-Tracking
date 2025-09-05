@@ -76,9 +76,9 @@ const Signup = ({ selectedRole }: SignupProps) => {
   const [showPassword, setShowPassword] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  //@ts-ignore
   const [step, setStep] = useState<"signUp" | "signIn">("signUp");
   const checkUserExists = useMutation(api.auth.checkUserExists);
-  console.log("selectedRole", setStep);
 
   // Mutations for automatic email verification
   const generateToken = useMutation(
@@ -129,7 +129,6 @@ const Signup = ({ selectedRole }: SignupProps) => {
     const data = new FormData(form);
     setSuccess("");
     try {
-      console.log("im here", formData);
 
       if (!formData.gender) {
         throw new Error("Please select a gender");
@@ -141,7 +140,6 @@ const Signup = ({ selectedRole }: SignupProps) => {
       const proofDocs = await processFiles(formData.proofOfAddress);
       const landlordDocs = await processFiles(formData.landlordLicense);
 
-      console.log("exists", exists, inUsersTable);
 
       if (exists && inUsersTable) {
         toast.error("User already Registered!");
@@ -170,7 +168,7 @@ const Signup = ({ selectedRole }: SignupProps) => {
             const email: any = formData.email;
             const token = await generateToken({ email });
             await sendEmail({ email, token });
-            const updateUserResponse = await updateUser({
+             await updateUser({
               email: formData.email,
               firstName: formData.firstName,
               lastName: formData.lastName,
@@ -187,7 +185,6 @@ const Signup = ({ selectedRole }: SignupProps) => {
               proofOfAddress: proofDocs,
               landlordLicense: landlordDocs,
             });
-            console.log("updateUserResponse", updateUserResponse);
             toast.success(
               "Account created! Please check your email to verify your account.",
             );
@@ -217,8 +214,6 @@ const Signup = ({ selectedRole }: SignupProps) => {
         });
       }
     } catch (err: any) {
-      console.log("err", err.message);
-
       setError(err.message || "Signup failed");
       toast.error(err.message || "Signup failed");
     }
@@ -237,6 +232,47 @@ const Signup = ({ selectedRole }: SignupProps) => {
       [field]: [...prev[field], ...files], // append if multiple files
     }));
   };
+
+  const renderFilePreviews = (files: File[]) => {
+    if (!files || files.length === 0) return null;
+  
+    return (
+      <div className="flex flex-wrap gap-3 mt-3">
+        {files.map((file, index) => {
+          const isImage = file.type.startsWith("image/");
+          const objectUrl = isImage ? URL.createObjectURL(file) : null;
+  
+          return (
+            <div
+              key={index}
+              className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg shadow-sm bg-white hover:shadow-md transition-shadow duration-300 relative group"
+            >
+              {isImage && objectUrl ? (
+                <img
+                  src={objectUrl}
+                  alt={file.name}
+                  className="w-12 h-12 object-cover rounded-md border border-gray-200"
+                />
+              ) : (
+                <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-md text-gray-500 text-xs font-medium">
+                  {file.name.split(".").pop()?.toUpperCase() || "FILE"}
+                </div>
+              )}
+              <div className="flex flex-col truncate max-w-[150px]">
+                <span className="text-sm font-medium truncate">{file.name}</span>
+                <span className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</span>
+              </div>
+  
+              {/* Optional remove button */}
+              
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+  
+  
 
   return (
     <div className="min-h-screen flex bg-slate-50 font-sans antialiased">
@@ -444,7 +480,10 @@ const Signup = ({ selectedRole }: SignupProps) => {
                             Array.from(e.target.files || []),
                           )
                         }
+                        
                       />
+                          {renderFilePreviews(formData.idVerificationDocs)}
+
                     </div>
                   </label>
 
@@ -470,6 +509,8 @@ const Signup = ({ selectedRole }: SignupProps) => {
                           )
                         }
                       />
+                      {renderFilePreviews(formData.proofOfAddress)}
+
                     </div>
                   </label>
 
@@ -494,7 +535,10 @@ const Signup = ({ selectedRole }: SignupProps) => {
                             Array.from(e.target.files || []),
                           )
                         }
+                        
                       />
+                      {renderFilePreviews(formData.landlordLicense)}
+
                     </div>
                   </label>
                 </div>

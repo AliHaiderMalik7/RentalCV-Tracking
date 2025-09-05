@@ -20,11 +20,12 @@ function ForgotPassword({ onEmailSubmitted, setStep }: ForgotPasswordProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    console.log("issubmitted", isSubmitted);
+    
 
     //   const sendResetEmail = useMutation(api.auth.sendPasswordReset);
 
     const { signIn } = useAuthActions();
-    console.log("isSubmitted", isSubmitted);
     
 
 
@@ -33,18 +34,13 @@ function ForgotPassword({ onEmailSubmitted, setStep }: ForgotPasswordProps) {
         try {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
-            const result = await signIn("password", formData).then(() =>
+            await signIn("password", formData).then(() =>
                 setStep({ email: formData.get("email") as string })
             );
-
-
-            
-            console.log("result", result);
             setIsSubmitted(true);
             onEmailSubmitted(true);
 
         } catch (err) {
-            console.log("err", err);
             onEmailSubmitted(false);
 
             setIsSubmitted(false)
@@ -54,17 +50,6 @@ function ForgotPassword({ onEmailSubmitted, setStep }: ForgotPasswordProps) {
     };
 
 
-    // const handleResetPassword = async (event: any) => {
-    //     event.preventDefault();
-    //     const formData = new FormData(event.currentTarget);
-    //     console.log("formDtaaaaa", formData);
-    //     const result = await signIn("password", {
-    //         flow: "reset-verification",
-    //     });
-
-    //     console.log("result forgot", result);
-
-    // }
 
 
 

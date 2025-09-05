@@ -35,7 +35,7 @@ export const createTenantRequest = mutation({
   handler: async (ctx, args) => {
     try {
       // Check for duplicate property entries by the same tenant
-      const existingProperties = await ctx.db
+       await ctx.db
         .query("properties")
         .filter((q) =>
           q.and(

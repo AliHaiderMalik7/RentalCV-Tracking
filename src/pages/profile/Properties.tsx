@@ -24,26 +24,7 @@ const Properties = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const initialFormData: PropertyFormData = {
-    addressLine1: '',
-    addressLine2: '',
-    city: '',
-    county: '',
-    postcode: '',
-    propertyType: 'flat',
-    bedrooms: 1,
-    bathrooms: 1,
-    livingRooms: 1,
-    kitchens: 1,
-    hasGarden: false,
-    parkingType: 'street',
-    epcRating: 'C',
-    description: '',
-    photos: [],
-    documents: [],
-    rent: 0,
-    occupancyStatus: 'vacant'
-  };
+
 
   const handleEditProperty = (property: any) => {
     setSelectedProperty(property);

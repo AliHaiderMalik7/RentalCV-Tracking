@@ -12,27 +12,24 @@ import TenantInviteVerification from "@/components/home/landlord/tenant/TenantIn
 import TenantInviteAcceptance from "@/pages/tenant/InviteAcceptance";
 import TenantSignup from "@/pages/tenant/TenantSignup";
 import LandlordVerification from "@/pages/auth/LandlordVerification";
-import LandlordOnboarding from "@/pages/landlord/LandlordOnboarding";
+// import LandlordOnboarding from "@/pages/landlord/LandlordOnboarding";
 import TenantPropertyDetailsForm from "@/components/home/tenant/TenantPropertyDetailsForm";
-import TenantOnboarding from "@/pages/auth/TenantOnboarding";
 import LandlordReviewForm from "@/components/reviews/LandlordReviewForm";
 
 export function AppRoutes() {
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState<any>(null);
-  const [resetEmail, setResetEmail] = useState<string>();
+  // const [resetEmail, setResetEmail] = useState<string>();
   const { isLoading, isAuthenticated } = useConvexAuth();
   const [step, setStep] = useState<"forgot" | { email: string }>("forgot");
-  console.log("resetEmail", resetEmail);
 
-  console.log("isAuthenticated", isAuthenticated);
   const handleRoleSelect = (role: "tenant" | "landlord") => {
     setSelectedRole(role);
     navigate("/signup");
   };
 
-  const handleEmailSubmitted = (email: any) => {
-    setResetEmail(email);
+  const handleEmailSubmitted = () => {
+    // setResetEmail(email);
     navigate("/reset-password");
   };
 
@@ -112,7 +109,7 @@ export function AppRoutes() {
       <Route path="/tenant/signup" element={<TenantSignup />} />
 
       <Route path="/landlord-verification" element={<LandlordVerification />} />
-      <Route path="/landlord/onboarding" element={<LandlordOnboarding />} />
+      {/* <Route path="/landlord/onboarding" element={<LandlordOnboarding />} /> */}
 
       <Route
         path="/tenant/add-property"

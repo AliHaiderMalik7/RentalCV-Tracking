@@ -15,7 +15,10 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  //@ts-ignore
   const [step, setStep] = useState<"signUp" | "signIn">("signIn");
+  //@ts-ignore
   const [error, setError] = useState<String | null>(null);
   const [showPassword, setShowPassword] = useState(true);
   // const [rememberMe, setRememberMe] = useState(false);
@@ -25,7 +28,6 @@ const Login = () => {
   const checkEmailVerifiedByEmail = useMutation(
     api.auth.checkEmailVerifiedByEmail,
   );
-  console.log("error", error, setStep);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,8 +39,7 @@ const Login = () => {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log("formData", data);
+    new FormData(event.currentTarget);
 
     try {
       const response = await checkEmailVerifiedByEmail({
@@ -65,9 +66,7 @@ const Login = () => {
       if (result.signingIn) {
         navigate("/home"); // Redirect on success
       }
-      console.log("Login successful", result);
     } catch (err) {
-      console.error("Login error:", err);
 
       let errorMessage = "Login failed. Please try again.";
       if (err instanceof Error) {

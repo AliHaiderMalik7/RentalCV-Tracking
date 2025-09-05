@@ -354,9 +354,9 @@ const LandlordReviewForm = ({ tenancyId }: LandlordReviewFormProps) => {
               <Button
                 type="submit"
                 disabled={loading}
-                loading={loading}
+                // loading={loading}
                 className="px-8 py-3 text-lg font-semibold"
-                size="lg"
+                // size="lg"
               >
                 Submit Review
               </Button>

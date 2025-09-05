@@ -88,7 +88,6 @@ const TenantOnboarding = () => {
             <Button
               onClick={handleAddProperty}
               className="w-full py-4 text-lg font-semibold"
-              size="lg"
             >
               Add Property & Invite Landlord
             </Button>

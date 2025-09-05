@@ -508,8 +508,8 @@ const TenantPropertyDetailsForm = ({
                         value={formData.monthlyRent}
                         onChange={handleInputChange}
                         placeholder="1200.00"
-                        step="0.01"
-                        min="0"
+                        // step="0.01"
+                        // min="0"
                       />
 
                       <InputField
@@ -519,8 +519,8 @@ const TenantPropertyDetailsForm = ({
                         value={formData.depositAmount}
                         onChange={handleInputChange}
                         placeholder="2400.00"
-                        step="0.01"
-                        min="0"
+                        // step="0.01"
+                        // min="0"
                       />
                     </div>
                   </div>
@@ -584,7 +584,7 @@ const TenantPropertyDetailsForm = ({
                 <div className="flex gap-3">
                   <Button
                     onClick={handleBack}
-                    variant="outline"
+                    // variant="outline"
                     className="flex-1"
                   >
                     Back
@@ -681,7 +681,7 @@ const TenantPropertyDetailsForm = ({
                 <div className="flex gap-3">
                   <Button
                     onClick={handleBack}
-                    variant="outline"
+                    // variant="outline"
                     className="flex-1"
                   >
                     Back
@@ -764,7 +764,7 @@ const TenantPropertyDetailsForm = ({
                   {onClose && (
                     <Button
                       onClick={onClose}
-                      variant="outline"
+                      // variant="outline"
                       className="flex-1"
                     >
                       Close

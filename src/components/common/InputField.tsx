@@ -14,6 +14,8 @@ type InputFieldProps = {
   inputClassName?: string;
   leftIconClassName?: string;
   rightIconClassName?: string;
+  label?: string; // <-- add this
+
 };
 
 const InputField = ({
@@ -30,9 +32,16 @@ const InputField = ({
   inputClassName = "",
   leftIconClassName = "",
   rightIconClassName = "",
+  label, // <-- destructure it
+
 }: InputFieldProps) => {
   return (
     <div className={`relative ${className}`}>
+       {label && (
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
+      )}
       {leftIcon && (
         <div
           className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 ${leftIconClassName}`}

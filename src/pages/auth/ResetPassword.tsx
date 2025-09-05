@@ -32,7 +32,6 @@ function ResetPassword({ step, email }: ResetPasswordProps) {
         event.preventDefault();
         const form = event.currentTarget;
         const data = new FormData(form); 
-        console.log("formmmmmm", data);
 
 
         try {

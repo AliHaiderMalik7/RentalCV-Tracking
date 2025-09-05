@@ -9,7 +9,6 @@ interface UpdateProfileFormProps {
 }
 
 const UpdateProfileForm = ({ isOpen, onClose, user, onSave }: UpdateProfileFormProps) => {
-    console.log("user in update profile", user);
     
     const [formData, setFormData] = useState({
         firstName: "",

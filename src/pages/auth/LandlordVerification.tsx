@@ -421,7 +421,7 @@ const LandlordVerification = ({}: LandlordVerificationProps) => {
                   !hasScrolledToBottom ||
                   !formData.agreeToReview
                 }
-                loading={loading}
+                // loading={loading}
                 className="px-8 py-3"
               >
                 Verify Tenancy & Continue to Review

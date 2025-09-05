@@ -1,7 +1,6 @@
 // IP Detection Service - Enhanced
 import { action, mutation, query } from "../_generated/server";
 import { v } from "convex/values";
-import { api } from "../_generated/api";
 
 export const detectCountryFromIP = action({
   args: { ipAddress: v.string() },
@@ -15,19 +14,7 @@ export const detectCountryFromIP = action({
     cached: v.optional(v.boolean()),
     error: v.optional(v.string()),
   }),
-  handler: async (
-    ctx,
-    args,
-  ): Promise<{
-    success: boolean;
-    country?: string;
-    countryCode?: string;
-    region?: string;
-    city?: string;
-    timezone?: string;
-    cached?: boolean;
-    error?: string;
-  }> => {
+  handler: async (_ctx, args) => {
     try {
       // Skip detection for local/private IPs
       if (
@@ -48,9 +35,7 @@ export const detectCountryFromIP = action({
         };
       }
 
-      // TODO: Add caching - temporarily simplified to avoid circular reference issues
-
-      // Use a free IP geolocation API (ip-api.com)
+      // Use ip-api.com
       const response = await fetch(
         `http://ip-api.com/json/${args.ipAddress}?fields=status,message,country,countryCode,region,regionName,city,timezone`,
       );
@@ -58,7 +43,6 @@ export const detectCountryFromIP = action({
 
       if (data.status !== "success") {
         console.error("IP detection API error:", data.message);
-        // Return default fallback
         return {
           success: true,
           country: "United States",
@@ -70,10 +54,9 @@ export const detectCountryFromIP = action({
         };
       }
 
-      // Map country to region code for legal compliance
       const regionCode = mapCountryToRegion(data.country);
 
-      const result = {
+      return {
         success: true,
         country: data.country,
         countryCode: data.countryCode,
@@ -82,14 +65,8 @@ export const detectCountryFromIP = action({
         timezone: data.timezone,
         cached: false,
       };
-
-      // TODO: Cache the result - temporarily disabled to avoid circular references
-
-      return result;
     } catch (error) {
       console.error("IP detection failed:", error);
-
-      // Return default fallback on any error
       return {
         success: true,
         country: "United States",
@@ -102,6 +79,7 @@ export const detectCountryFromIP = action({
     }
   },
 });
+
 
 // Helper function to map countries to legal regions
 function mapCountryToRegion(country: string): string {

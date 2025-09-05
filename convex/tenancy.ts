@@ -441,7 +441,7 @@ export const createTenantInitiatedRequest = mutation({
         }
 
         // Check if tenant already has a request for this property
-        const existingRequest = await ctx.db
+        await ctx.db
             .query("tenancies")
             .withIndex("by_tenant_email", (q) => q.eq("invitedTenantEmail", ""))
             .filter((q) => q.eq(q.field("status"), "tenant_initiated"))
@@ -748,16 +748,16 @@ export const resendInvitation = mutation({
         });
 
         // Get landlord info for email
-        const landlord = await ctx.db.get(userId);
-        const landlordName = landlord
-            ? `${landlord.firstName} ${landlord.lastName}`
-            : "Your Landlord";
+         await ctx.db.get(userId);
+        // const landlordName = landlord
+        //     ? `${landlord.firstName} ${landlord.lastName}`
+        //     : "Your Landlord";
 
         // Get property info
-        const property = await ctx.db.get(tenancy.propertyId);
-        const propertyAddress = property
-            ? `${property.addressLine1}, ${property.city}`
-            : "Your Property";
+         await ctx.db.get(tenancy.propertyId);
+        // const propertyAddress = property
+        //     ? `${property.addressLine1}, ${property.city}`
+        //     : "Your Property";
 
         // Schedule email to be sent (in a real implementation, you'd call the email action)
         // For now, we'll just log what would be sent

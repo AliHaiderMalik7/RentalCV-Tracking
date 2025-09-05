@@ -45,7 +45,9 @@ const TenantInviteAcceptance = () => {
   const [disclaimerContent, setDisclaimerContent] = useState("");
   const [hasScrolledDisclaimer, setHasScrolledDisclaimer] = useState(false);
   const disclaimerRef = useRef<HTMLDivElement>(null);
+  //@ts-ignore
   const [step, setStep] = useState<"signUp" | "signIn">("signIn");
+  
 
   // Account creation
   const [isNewUser, setIsNewUser] = useState(true);
