@@ -21,15 +21,15 @@ type EnrichedTenancy = {
   startDate: number;
   endDate: number;
   status:
-    | "invited"
-    | "pending_tenant_response"
-    | "pending_confirmation"
-    | "active"
-    | "ended"
-    | "declined"
-    | "tenant_initiated"
-    | "landlord_reviewing"
-    | "disputed";
+  | "invited"
+  | "pending_tenant_response"
+  | "pending_confirmation"
+  | "active"
+  | "ended"
+  | "declined"
+  | "tenant_initiated"
+  | "landlord_reviewing"
+  | "disputed";
   referenceAvailable: boolean;
 };
 
@@ -73,64 +73,63 @@ const RentalHistoryPage = () => {
                 className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
               >
                 {/* Row */}
-               {/* Row */}
-<div
-  className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
-  onClick={() => toggleExpand(entry._id)}
->
-  <div className="flex items-center gap-3">
-    <div className="p-2 bg-blue-50 rounded-full text-[#0369a1]">
-      <FaHome />
-    </div>
-    <div>
-      <h3 className="font-medium text-gray-800">
-        {entry?.property?.addressLine1 ?? "No address"}
-      </h3>
-      <p className="text-gray-800">{entry?.property?.description ?? ""}</p>
-    </div>
-  </div>
+                {/* Row */}
+                <div
+                  className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
+                  onClick={() => toggleExpand(entry._id)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-50 rounded-full text-[#0369a1]">
+                      <FaHome />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-800">
+                        {entry?.property?.addressLine1 ?? "No address"}
+                      </h3>
+                      <p className="text-gray-800">{entry?.property?.description ?? ""}</p>
+                    </div>
+                  </div>
 
-  <div className="flex items-center gap-3">
-    {/* Status Pill */}
-    <span
-      className={`px-2 py-1 text-xs rounded-full font-medium ${
-        entry.status === "active"
-          ? "bg-green-100 text-green-800"
-          : entry.status === "ended"
-          ? "bg-gray-100 text-gray-800"
-          : entry.status === "invited" ||
-            entry.status === "pending_tenant_response" ||
-            entry.status === "pending_confirmation"
-          ? "bg-yellow-100 text-yellow-800"
-          : entry.status === "declined" ||
-            entry.status === "tenant_initiated" ||
-            entry.status === "landlord_reviewing"
-          ? "bg-orange-100 text-orange-800"
-          : entry.status === "disputed"
-          ? "bg-red-100 text-red-800"
-          : "bg-gray-100 text-gray-800"
-      }`}
-    >
-      {entry.status.replace(/_/g, " ").toUpperCase()}
-    </span>
+                  <div className="flex items-center gap-3">
+                    {/* Status Pill */}
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full font-medium ${entry.status === "active"
+                          ? "bg-green-100 text-green-800"
+                          : entry.status === "ended"
+                            ? "bg-gray-100 text-gray-800"
+                            : entry.status === "invited" ||
+                              entry.status === "pending_tenant_response" ||
+                              entry.status === "pending_confirmation"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : entry.status === "declined" ||
+                                entry.status === "tenant_initiated" ||
+                                entry.status === "landlord_reviewing"
+                                ? "bg-orange-100 text-orange-800"
+                                : entry.status === "disputed"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-gray-100 text-gray-800"
+                        }`}
+                    >
+                      {entry.status.replace(/_/g, " ").toUpperCase()}
+                    </span>
 
-    {/* Delete Button */}
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        // TODO: handle delete
-      }}
-      className="text-gray-400 hover:text-red-500 p-1 transition-colors"
-    >
-      <FaTrash />
-    </button>
+                    {/* Delete Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // TODO: handle delete
+                      }}
+                      className="text-gray-400 hover:text-red-500 p-1 transition-colors"
+                    >
+                      <FaTrash />
+                    </button>
 
-    {/* Chevron Icon */}
-    <div className="text-gray-400 p-1">
-      {expandedId === entry._id ? <FaChevronUp /> : <FaChevronDown />}
-    </div>
-  </div>
-</div>
+                    {/* Chevron Icon */}
+                    <div className="text-gray-400 p-1">
+                      {expandedId === entry._id ? <FaChevronUp /> : <FaChevronDown />}
+                    </div>
+                  </div>
+                </div>
 
 
                 {/* Expanded */}
