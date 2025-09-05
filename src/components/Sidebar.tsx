@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useNavigate } from "react-router-dom";
-import "./Sidebar.css"; 
+import "./Sidebar.css"; // 👈 Import external CSS
 
 interface SidebarProps {
   role?: 'landlord' | 'tenant';
@@ -53,9 +53,8 @@ const Sidebar = ({ role, activeTab, onTabChange }: SidebarProps) => {
   };
 
   return (
-    <div className="h-screen bg-[#075985] fixed left-0 top-0 flex flex-col border-r border-[#0a7ba8]/30 
-                    transition-all duration-300 w-20 md:w-72">
-      
+    <div className="bg-[#075985] fixed left-0 top-0 bottom-0 flex flex-col border-r border-[#0a7ba8]/30 
+    transition-all duration-300 w-20 md:w-72 min-h-screen">
       {/* Logo Section */}
       <div className="px-3 md:px-6 py-7 bg-white/95 backdrop-blur-sm border-b border-[#0a7ba8]/10 flex items-center justify-center md:justify-start">
         <div className="bg-[#0369a1] w-10 h-10 rounded-lg flex items-center justify-center shadow-sm">

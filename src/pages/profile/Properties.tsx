@@ -181,15 +181,22 @@ const Properties = () => {
             {/* Main Content */}
             <div className="">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex justify-between items-center mb-8">
-                        <h1 className="text-3xl font-bold text-slate-800">Property Portfolio</h1>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8 gap-3 sm:gap-0">
+                        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 truncate text-center sm:text-left">
+                            Property Portfolio
+                        </h1>
                         <button
-                            onClick={() => setIsAddingProperty(true)}
-                            className="bg-[#0369a1] hover:bg-[#075985] text-white px-4 py-2 rounded-lg transition-colors"
+                            onClick={() => setIsAddingProperty(!isAddingProperty)}
+                            className="bg-[#0369a1] hover:bg-[#075985] text-white 
+                            px-3 py-1.5 sm:px-4 sm:py-2 
+                            rounded-lg transition-colors 
+                            text-sm sm:text-base whitespace-nowrap"
                         >
                             Add New Property
                         </button>
                     </div>
+
+
 
                     {isAddingProperty && (
                         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
@@ -206,10 +213,10 @@ const Properties = () => {
                         </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         {properties?.map(property => (
                             <PropertyCard
-                                // key={property?.id}
+                                key={property?._id}
                                 property={property}
                                 showActions={true}
                                 onDelete={() => handleDelete(property._id)}
@@ -217,6 +224,7 @@ const Properties = () => {
                             />
                         ))}
                     </div>
+
 
                     {properties?.length === 0 && (
                         <div className="bg-white rounded-xl shadow-md p-8 text-center">
