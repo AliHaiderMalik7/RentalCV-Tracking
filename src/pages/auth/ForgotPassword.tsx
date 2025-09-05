@@ -36,6 +36,9 @@ function ForgotPassword({ onEmailSubmitted, setStep }: ForgotPasswordProps) {
             const result = await signIn("password", formData).then(() =>
                 setStep({ email: formData.get("email") as string })
             );
+
+
+            
             console.log("result", result);
             setIsSubmitted(true);
             onEmailSubmitted(true);

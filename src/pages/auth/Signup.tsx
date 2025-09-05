@@ -73,7 +73,7 @@ const Signup = ({ selectedRole }: SignupProps) => {
 
   const { signOut } = useAuthActions();
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [step, setStep] = useState<"signUp" | "signIn">("signUp");
@@ -194,7 +194,7 @@ const Signup = ({ selectedRole }: SignupProps) => {
 
             setTimeout(() => {
               if (selectedRole === "tenant") {
-                navigate("/login");
+                navigate("/login" );
               } else {
                 navigate("/login");
               }

@@ -20,7 +20,7 @@ function ResetPassword({ step, email }: ResetPasswordProps) {
     const [error, setError] = useState("");
 
 
-    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(true);
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -30,8 +30,8 @@ function ResetPassword({ step, email }: ResetPasswordProps) {
 
     const handleResetPassword = async (event: any) => {
         event.preventDefault();
-        const form = event.currentTarget; // ✅ this is your HTMLFormElement
-        const data = new FormData(form); // ✅ corre    setError("");
+        const form = event.currentTarget;
+        const data = new FormData(form); 
         console.log("formmmmmm", data);
 
 
@@ -112,7 +112,7 @@ function ResetPassword({ step, email }: ResetPasswordProps) {
                                 <FaLock className="text-lg" />
                             </div>
                             <input
-                                type={showNewPassword ? "text" : "password"}
+                                type={!showNewPassword ? "text" : "password"}
                                 name="newPassword"
                                 placeholder="New Password"
                                 className="w-full pl-12 pr-12 py-3 border-b border-slate-200 focus:border-[#28c76f] focus:outline-none bg-transparent transition-colors duration-300 placeholder-slate-400"

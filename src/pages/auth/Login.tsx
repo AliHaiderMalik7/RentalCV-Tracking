@@ -17,7 +17,7 @@ const Login = () => {
   });
   const [step, setStep] = useState<"signUp" | "signIn">("signIn");
   const [error, setError] = useState<String | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
   // const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { signIn } = useAuthActions();
