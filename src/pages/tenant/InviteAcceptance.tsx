@@ -21,8 +21,8 @@ const TenantInviteAcceptance = () => {
   const queryParams = new URLSearchParams(location.search);
   const inviteToken = queryParams.get("token");
 
-  // Multi-step state
-  const [step, setStep] = useState<
+  // Multi-stepInvite state
+  const [stepInvite, setstepInvite] = useState<
     | "loading"
     | "ip-detection"
     | "country-selection"
@@ -45,6 +45,7 @@ const TenantInviteAcceptance = () => {
   const [disclaimerContent, setDisclaimerContent] = useState("");
   const [hasScrolledDisclaimer, setHasScrolledDisclaimer] = useState(false);
   const disclaimerRef = useRef<HTMLDivElement>(null);
+  const [step, setStep] = useState<"signUp" | "signIn">("signIn");
 
   // Account creation
   const [isNewUser, setIsNewUser] = useState(true);
@@ -62,6 +63,9 @@ const TenantInviteAcceptance = () => {
     inviteToken ? { inviteToken } : "skip",
   );
 
+  console.log("tenancyDetails", tenancyDetails);
+
+
   // Get current user
   const currentUser = useQuery(api.auth.getCurrentUser);
 
@@ -70,9 +74,9 @@ const TenantInviteAcceptance = () => {
     api.services.disclaimers.getDisclaimerByRegion,
     selectedCountry
       ? {
-          region: getRegionCode(selectedCountry.value),
-          category: "tenant_invite_acceptance",
-        }
+        region: getRegionCode(selectedCountry.value),
+        category: "tenant_invite_acceptance",
+      }
       : "skip",
   );
 
@@ -114,10 +118,23 @@ const TenantInviteAcceptance = () => {
     return regions[country] || "INTERNATIONAL";
   }
 
+
+
+  // Get tenancy details by invite token
+  useEffect(() => {
+    if (tenancyDetails?.invitedTenantEmail) {
+      setAccountData((prev) => ({
+        ...prev,
+        email: tenancyDetails.invitedTenantEmail ?? "", // ✅ fallback to empty string
+      }));
+    }
+  }, [tenancyDetails]);
+
+
   // Initial validation and setup
   useEffect(() => {
     // Only run this initialization logic when we're still in the loading state
-    if (step !== "loading") return;
+    if (stepInvite !== "loading") return;
 
     if (!inviteToken) {
       toast.error("Invalid invitation link");
@@ -142,16 +159,16 @@ const TenantInviteAcceptance = () => {
       return;
     }
 
-    // Move to IP detection step
-    setStep("ip-detection");
-  }, [tenancyDetails, inviteToken, navigate, step]);
+    // Move to IP detection stepInvite
+    setstepInvite("ip-detection");
+  }, [tenancyDetails, inviteToken, navigate, stepInvite]);
 
   // IP Detection
   useEffect(() => {
-    if (step === "ip-detection") {
+    if (stepInvite === "ip-detection") {
       detectLocation();
     }
-  }, [step]);
+  }, [stepInvite]);
 
   const detectLocation = async () => {
     setLoading(true);
@@ -182,14 +199,14 @@ const TenantInviteAcceptance = () => {
         };
         setSelectedCountry(detectedOption);
 
-        setStep("country-selection");
+        setstepInvite("country-selection");
       } else {
         // Fallback to manual country selection
-        setStep("country-selection");
+        setstepInvite("country-selection");
       }
     } catch (error) {
       console.error("IP detection failed:", error);
-      setStep("country-selection");
+      setstepInvite("country-selection");
     } finally {
       setLoading(false);
     }
@@ -226,10 +243,10 @@ const TenantInviteAcceptance = () => {
       }
     };
 
-    if (step === "country-selection") {
+    if (stepInvite === "country-selection") {
       loadCountries();
     }
-  }, [step]);
+  }, [stepInvite]);
 
   // Load disclaimer when country is selected
   useEffect(() => {
@@ -244,7 +261,7 @@ const TenantInviteAcceptance = () => {
       toast.error("Please select your country of residence");
       return;
     }
-    setStep("disclaimer");
+    setstepInvite("disclaimer");
   };
 
   // Handle disclaimer scroll
@@ -269,10 +286,10 @@ const TenantInviteAcceptance = () => {
 
   // Check scroll on disclaimer content load
   useEffect(() => {
-    if (disclaimerRef.current && step === "disclaimer") {
+    if (disclaimerRef.current && stepInvite === "disclaimer") {
       handleScroll(); // Check immediately when disclaimer loads
     }
-  }, [disclaimerContent, step]);
+  }, [disclaimerContent, stepInvite]);
 
   // Handle disclaimer acceptance
   const handleDisclaimerAccept = async () => {
@@ -305,7 +322,7 @@ const TenantInviteAcceptance = () => {
         await handleInviteAcceptance(complianceLogId);
       } else {
         // Need to create account or login
-        setStep("account");
+        setstepInvite("account");
       }
     } catch (error) {
       console.error("Error logging compliance:", error);
@@ -359,13 +376,23 @@ const TenantInviteAcceptance = () => {
           lastName: accountData.lastName,
           role: "tenant",
         });
+
+        setstepInvite("confirmation");
+
         toast.success("Account created successfully!");
       } else {
-        await signIn("password", {
+        const result = await signIn("password", {
+          flow: "signIn",
           email: accountData.email,
           password: accountData.password,
         });
-        toast.success("Logged in successfully!");
+
+        if (result.signingIn) {
+          setstepInvite("confirmation");
+
+          toast.success("Logged in successfully!");
+        }
+       
       }
 
       // Wait a moment for auth to settle, then accept the invitation
@@ -400,7 +427,7 @@ const TenantInviteAcceptance = () => {
       });
 
       if (result.success) {
-        setStep("confirmation");
+        setstepInvite("confirmation");
       } else {
         toast.error(result.error || "Failed to accept invitation");
       }
@@ -425,7 +452,7 @@ const TenantInviteAcceptance = () => {
       if (result.success) {
         if (confirmed) {
           toast.success("Tenancy confirmed! Welcome to RentalCV!");
-          setStep("complete");
+          setstepInvite("complete");
         } else {
           toast.info(
             "We've flagged this tenancy for review. Our team will investigate.",
@@ -444,7 +471,7 @@ const TenantInviteAcceptance = () => {
   };
 
   // Render loading state
-  if (step === "loading") {
+  if (stepInvite === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -454,7 +481,7 @@ const TenantInviteAcceptance = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-  <div className="container max-w-3xl mx-auto px-4 py-8 bg-white rounded-xl shadow">
+      <div className="container max-w-3xl mx-auto px-4 py-8 bg-white rounded-xl shadow">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-8">
             {/* Header */}
@@ -472,7 +499,7 @@ const TenantInviteAcceptance = () => {
               <div className="flex items-center justify-between text-sm text-gray-500">
                 <span
                   className={
-                    step === "ip-detection" || step === "country-selection"
+                    stepInvite === "ip-detection" || stepInvite === "country-selection"
                       ? "text-blue-600 font-medium"
                       : ""
                   }
@@ -481,28 +508,28 @@ const TenantInviteAcceptance = () => {
                 </span>
                 <span
                   className={
-                    step === "disclaimer" ? "text-blue-600 font-medium" : ""
+                    stepInvite === "disclaimer" ? "text-blue-600 font-medium" : ""
                   }
                 >
                   Terms
                 </span>
                 <span
                   className={
-                    step === "account" ? "text-blue-600 font-medium" : ""
+                    stepInvite === "account" ? "text-blue-600 font-medium" : ""
                   }
                 >
                   Account
                 </span>
                 <span
                   className={
-                    step === "confirmation" ? "text-blue-600 font-medium" : ""
+                    stepInvite === "confirmation" ? "text-blue-600 font-medium" : ""
                   }
                 >
                   Confirm
                 </span>
                 <span
                   className={
-                    step === "complete" ? "text-blue-600 font-medium" : ""
+                    stepInvite === "complete" ? "text-blue-600 font-medium" : ""
                   }
                 >
                   Complete
@@ -513,15 +540,15 @@ const TenantInviteAcceptance = () => {
                   className="h-1 bg-blue-600 rounded-full transition-all duration-300"
                   style={{
                     width:
-                      step === "ip-detection" || step === "country-selection"
+                      stepInvite === "ip-detection" || stepInvite === "country-selection"
                         ? "20%"
-                        : step === "disclaimer"
+                        : stepInvite === "disclaimer"
                           ? "40%"
-                          : step === "account"
+                          : stepInvite === "account"
                             ? "60%"
-                            : step === "confirmation"
+                            : stepInvite === "confirmation"
                               ? "80%"
-                              : step === "complete"
+                              : stepInvite === "complete"
                                 ? "100%"
                                 : "0%",
                   }}
@@ -529,8 +556,8 @@ const TenantInviteAcceptance = () => {
               </div>
             </div>
 
-            {/* Step Content */}
-            {step === "ip-detection" && (
+            {/* stepInvite Content */}
+            {stepInvite === "ip-detection" && (
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <h2 className="text-xl font-semibold mb-2">
@@ -542,7 +569,7 @@ const TenantInviteAcceptance = () => {
               </div>
             )}
 
-            {step === "country-selection" && (
+            {stepInvite === "country-selection" && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">
                   Confirm Your Country
@@ -582,7 +609,7 @@ const TenantInviteAcceptance = () => {
               </div>
             )}
 
-            {step === "disclaimer" && (
+            {stepInvite === "disclaimer" && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">Legal Disclaimer</h2>
                 <div className="mb-4">
@@ -652,7 +679,7 @@ const TenantInviteAcceptance = () => {
               </div>
             )}
 
-            {step === "account" && (
+            {stepInvite === "account" && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">
                   {isNewUser ? "Create Account" : "Sign In"}
@@ -662,22 +689,20 @@ const TenantInviteAcceptance = () => {
                   <button
                     type="button"
                     onClick={() => setIsNewUser(true)}
-                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                      isNewUser
+                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${isNewUser
                         ? "bg-white text-gray-900 shadow-sm"
                         : "text-gray-600"
-                    }`}
+                      }`}
                   >
                     Create Account
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsNewUser(false)}
-                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                      !isNewUser
+                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${!isNewUser
                         ? "bg-white text-gray-900 shadow-sm"
                         : "text-gray-600"
-                    }`}
+                      }`}
                   >
                     Sign In
                   </button>
@@ -727,6 +752,8 @@ const TenantInviteAcceptance = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address *
                     </label>
+                    <input name="flow" type="hidden" value={step} />
+
                     <input
                       type="email"
                       value={accountData.email}
@@ -736,8 +763,10 @@ const TenantInviteAcceptance = () => {
                           email: e.target.value,
                         }))
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md 
+                      focus:outline-none focus:ring-2 focus:ring-blue-500 
+                      disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"                      required
+                      disabled
                     />
                   </div>
 
@@ -779,7 +808,7 @@ const TenantInviteAcceptance = () => {
                     </div>
                   )}
 
-                  <Button type="submit" disabled={loading} className="w-full">
+                  <Button type="submit" disabled={loading} className="w-full" >
                     {loading
                       ? "Processing..."
                       : isNewUser
@@ -790,7 +819,7 @@ const TenantInviteAcceptance = () => {
               </div>
             )}
 
-            {step === "confirmation" && tenancyDetails && (
+            {stepInvite === "confirmation" && tenancyDetails && (
               <div>
                 <h2 className="text-xl font-semibold mb-4">
                   Confirm Tenancy Details
@@ -863,7 +892,7 @@ const TenantInviteAcceptance = () => {
               </div>
             )}
 
-            {step === "complete" && (
+            {stepInvite === "complete" && (
               <div className="text-center">
                 <div className="mb-6">
                   <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
