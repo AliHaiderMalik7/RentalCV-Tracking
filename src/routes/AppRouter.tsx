@@ -123,14 +123,14 @@ export function AppRoutes() {
         }
       />
 
-      <Route
+      {/* <Route
         path="/tenant/onboarding"
         element={
           <Authenticated>
             <TenantOnboarding />
           </Authenticated>
         }
-      />
+      /> */}
 
       <Route
         path="/landlord/review-tenant"

@@ -75,7 +75,7 @@ const RentalHistoryPage = () => {
         </div>
 
         {/* Add Rental Form */}
-        {isAdding && (
+        {/* {isAdding && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-gray-800">Add New Rental</h2>
@@ -157,10 +157,10 @@ const RentalHistoryPage = () => {
               </button>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Rental History List */}
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           {rentalHistory.length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-50 mb-4">
@@ -235,7 +235,7 @@ const RentalHistoryPage = () => {
               </div>
             ))
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

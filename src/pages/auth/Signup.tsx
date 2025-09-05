@@ -194,11 +194,19 @@ const Signup = ({ selectedRole }: SignupProps) => {
 
             setTimeout(() => {
               if (selectedRole === "tenant") {
-                navigate("/tenant/onboarding");
+                navigate("/login");
               } else {
                 navigate("/login");
               }
             }, 3000);
+
+            // setTimeout(() => {
+            //   if (selectedRole === "tenant") {
+            //     navigate("/tenant/onboarding");
+            //   } else {
+            //     navigate("/login");
+            //   }
+            // }, 3000);
           } catch (error) {
             console.error("Failed to send verification email:", error);
             toast.success(
