@@ -32,7 +32,7 @@ const InputField = ({
   rightIconClassName = "",
 }: InputFieldProps) => {
   return (
-    <div className={`relative ${className}` }>
+    <div className={`relative ${className}`}>
       {leftIcon && (
         <div
           className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 ${leftIconClassName}`}
